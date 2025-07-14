@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/screens/LoginPage.dart';
-import 'package:my_app/screens/SignupPage.dart';
-import 'package:my_app/screens/MainPage.dart';
+import 'package:Frontend/screens/LoginPage.dart';
+import 'package:Frontend/screens/SignupPage.dart';
+import 'package:Frontend/screens/MainPage.dart';
+import 'package:Frontend/screens/ScoreBoardpage.dart';
 
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 Future<void> main() async {
@@ -25,13 +26,15 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData(brightness: Brightness.dark),
           themeMode: mode,
-          initialRoute: '/',
+          initialRoute: '/ScoreBoardpage',
           routes: {
             '/': (context) => const LoginPage(emailId: '', password: ''),
             '/LoginPage': (context) =>
                 const LoginPage(emailId: '', password: ''),
             '/SignupPage': (context) => const SignupPage(),
             '/MainPage': (context) => const MainPage(),
+            '/ScoreBoardpage': (context) =>
+                const ScoreBoardPage(teamA: "", teamB: ""),
           },
         );
       },

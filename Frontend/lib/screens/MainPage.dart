@@ -1,3 +1,4 @@
+import 'package:Frontend/screens/ScoreBoardpage.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
@@ -10,6 +11,11 @@ class MainPage extends StatefulWidget {
 enum TossDecision { bat, bowl }
 
 class _MainPageState extends State<MainPage> {
+  late String teamA;
+  late String teamB;
+  late String overs;
+  late String playersCount;
+
   late TextEditingController teamAController;
   late TextEditingController teamBController;
   late TextEditingController oversController;
@@ -135,10 +141,10 @@ class _MainPageState extends State<MainPage> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    String teamA = teamAController.text;
-                    String teamB = teamBController.text;
-                    String overs = oversController.text;
-                    String playersCount = playersCountController.text;
+                    teamA = teamAController.text;
+                    teamB = teamBController.text;
+                    overs = oversController.text;
+                    playersCount = playersCountController.text;
 
                     print('Team A: $teamA');
                     print('Team B: $teamB');
@@ -158,6 +164,16 @@ class _MainPageState extends State<MainPage> {
                       tossWonBy = null;
                       chooseTo = null;
                     });
+                    // Inside MainPage's onPressed for 'Start Match'
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ScoreBoardPage(
+                          teamA: teamAController.text,
+                          teamB: teamBController.text,
+                        ),
+                      ),
+                    );
                   },
                   child: const Text('Start Match'),
                 ),
