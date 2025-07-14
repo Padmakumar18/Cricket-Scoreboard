@@ -92,6 +92,12 @@ class _MainPageState extends State<MainPage> {
             ),
 
             const SizedBox(height: 16),
+            TextFormField(
+              controller: playersCountController,
+              decoration: const InputDecoration(labelText: 'Players Count'),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
 
             /// Choose To
             const Text("Choose To:"),
@@ -120,6 +126,53 @@ class _MainPageState extends State<MainPage> {
                       });
                     },
                   ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    String teamA = teamAController.text;
+                    String teamB = teamBController.text;
+                    String overs = oversController.text;
+                    String playersCount = playersCountController.text;
+
+                    print('Team A: $teamA');
+                    print('Team B: $teamB');
+                    print('Overs: $overs');
+                    print('Players Count: $playersCount');
+                    print('Toss Won By: $tossWonBy');
+                    print(
+                      'Choose To: ${chooseTo == TossDecision.bat ? 'Bat' : 'Bowl'}',
+                    );
+
+                    // Clear the fields
+                    teamAController.clear();
+                    teamBController.clear();
+                    oversController.clear();
+                    playersCountController.clear();
+                    setState(() {
+                      tossWonBy = null;
+                      chooseTo = null;
+                    });
+                  },
+                  child: const Text('Start Match'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    teamAController.clear();
+                    teamBController.clear();
+                    oversController.clear();
+                    playersCountController.clear();
+                    setState(() {
+                      tossWonBy = null;
+                      chooseTo = null;
+                    });
+                  },
+                  child: const Text('Clear Fields'),
                 ),
               ],
             ),
