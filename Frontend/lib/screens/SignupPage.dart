@@ -137,7 +137,13 @@ class _SignupPageState extends State<SignupPage> {
                   Text("or"),
                   SizedBox(
                     child: ElevatedButton(
-                      onPressed: _handleSubmit,
+                      onPressed: () {
+                        _nameController.clear();
+                        _numberController.clear();
+                        _passwordController.clear();
+                        _otpController.clear();
+                        Navigator.pushReplacementNamed(context, '/LoginPage');
+                      },
                       child: const Text('Login'),
                     ),
                   ),

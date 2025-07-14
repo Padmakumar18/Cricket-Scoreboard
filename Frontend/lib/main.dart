@@ -9,16 +9,17 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  final String page = 'Login';
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Login App',
       debugShowCheckedModeBanner: false,
-      home: page == 'Login App'
-          ? const LoginPage(emailId: '', password: '')
-          : const SignupPage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LoginPage(emailId: '', password: ''),
+        '/LoginPage': (context) => const LoginPage(emailId: '', password: ''),
+        '/SignupPage': (context) => const SignupPage(),
+      },
     );
   }
 }

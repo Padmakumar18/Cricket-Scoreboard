@@ -94,6 +94,8 @@ class _LoginPageState extends State<LoginPage> {
 
                     emailController.clear();
                     passwordController.clear();
+
+                    Navigator.pushReplacementNamed(context, '/SignupPage');
                   },
                   child: const Text('Sign Up'),
                 ),
