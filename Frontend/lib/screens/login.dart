@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-class Login extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   final String emailId;
   final String password;
 
-  const Login({super.key, required this.emailId, required this.password});
+  const LoginPage({super.key, required this.emailId, required this.password});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginPageState extends State<LoginPage> {
+  // final _formKey = GlobalKey<FormState>();
+
   late TextEditingController emailController;
   late TextEditingController passwordController;
   bool _obscurePassword = true;
@@ -32,7 +34,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('LoginPage')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -41,7 +43,7 @@ class _LoginState extends State<Login> {
               controller: emailController,
               decoration: const InputDecoration(
                 labelText: 'Email',
-                border: OutlineInputBorder(),
+                // border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -51,7 +53,7 @@ class _LoginState extends State<Login> {
               obscureText: _obscurePassword,
               decoration: InputDecoration(
                 labelText: 'Password',
-                border: const OutlineInputBorder(),
+                // border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -64,22 +66,38 @@ class _LoginState extends State<Login> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                String email = emailController.text;
-                String password = passwordController.text;
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    String email = emailController.text;
+                    String password = passwordController.text;
 
-                print('Email: $email');
-                print('Password: $password');
+                    print('Email: $email');
+                    print('Password: $password');
 
-                emailController.clear();
-                passwordController.clear();
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   SnackBar(content: Text('Submitted: $email / $password')),
-                // );
-              },
-              child: const Text('Submit'),
+                    emailController.clear();
+                    passwordController.clear();
+                  },
+                  child: const Text('Login'),
+                ),
+                Text("or"),
+                ElevatedButton(
+                  onPressed: () {
+                    String email = emailController.text;
+                    String password = passwordController.text;
+
+                    print('Email: $email');
+                    print('Password: $password');
+
+                    emailController.clear();
+                    passwordController.clear();
+                  },
+                  child: const Text('Sign Up'),
+                ),
+              ],
             ),
           ],
         ),
