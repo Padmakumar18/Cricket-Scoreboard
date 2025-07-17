@@ -126,8 +126,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               runSpacing: 8,
               children: [
                 customButton("Retire", () {}),
-                customButton("Swap Striker", () {}),
-                customButton("End Over", () {}),
+                customButton("Swap striker", () {}),
+                customButton("End over", () {}),
                 customButton(
                   "Undo",
                   () {},
@@ -164,8 +164,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: Colors.black,
-                            shape: const CircleBorder(),
-                            padding: const EdgeInsets.all(18),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: Text(
                             run,
@@ -216,8 +218,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(18),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         child: const Text(
                           "More",
@@ -242,14 +246,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     Color textColor = Colors.black,
   }) {
     return SizedBox(
-      height: 40,
+      height: 50,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           minimumSize: const Size(70, 40),
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          textStyle: const TextStyle(fontSize: 13),
+          textStyle: const TextStyle(fontSize: 15),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         ),
         child: Text(label, style: TextStyle(color: textColor)),
@@ -384,7 +388,7 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
               selectedColor: Colors.green,
               labelStyle: TextStyle(
                 color: selectedExtras == event ? Colors.white : Colors.black,
-                fontSize: 13,
+                fontSize: 15,
               ),
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
@@ -415,7 +419,7 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
               selectedColor: Colors.red,
               labelStyle: TextStyle(
                 color: selectedWicket == event ? Colors.white : Colors.black,
-                fontSize: 13,
+                fontSize: 15,
               ),
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
