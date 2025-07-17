@@ -23,17 +23,18 @@ class ScoreBoardPage extends StatefulWidget {
 
 class _ScoreBoardPageState extends State<ScoreBoardPage> {
   List<String> thisOverRuns = [
-    "W",
+    "wd",
+    "lb2",
+    "wk",
     "1",
-    "2",
-    "0",
-    "4",
-    "1",
+    "nb5",
+    "wd-ro-1",
     "W",
     "6",
     "0",
-    "1",
+    "4",
   ];
+
   late String title;
 
   List<BatsmanStats> batsmen = [
@@ -106,9 +107,16 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 infoChip("Target: -"),
                 const SizedBox(width: 10),
                 infoChip("CRR: 10.0"),
+                const SizedBox(width: 10),
+                infoChip("Req RR: 10.0"),
               ],
             ),
             const SizedBox(height: 12),
+            const Text(
+              "34 runs needed in 36 overs",
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            // const SizedBox(height: 12),
             thisOverWidget(thisOverRuns),
             ScoreSummaryCard(batsmen: batsmen, bowlers: bowlers),
 
@@ -183,40 +191,73 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text("This over ", style: TextStyle(color: Colors.white)),
-        const Text("|", style: TextStyle(fontSize: 20, color: Colors.white)),
+        const Text("<", style: TextStyle(fontSize: 20, color: Colors.white)),
         const SizedBox(width: 5),
         SizedBox(
-          width: 200,
-          height: 40,
+          width: 220,
+          height: 60,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: runs.map((run) {
+                final isLong = run.length > 3;
+                bool isNumeric = RegExp(r'^\d+$').hasMatch(run);
+                Color bgColor = Colors.white;
+                if (run == "4" || run == "6") {
+                  bgColor = Colors.green;
+                } else if (isNumeric && run != "0") {
+                  bgColor = const Color.fromARGB(255, 255, 166, 0);
+                }
+
+                bool isDotBall = run == "0";
+                bool isLongText = run.length > 3;
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Container(
-                    width: 25,
-                    height: 25,
+                    constraints: BoxConstraints(
+                      minWidth: 35,
+                      maxWidth: isLong ? 70 : 40,
+                      minHeight: 35,
+                      maxHeight: isLong ? 50 : 40,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      run,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: isDotBall
+                        ? const Icon(Icons.park, size: 16, color: Colors.black)
+                        : FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              run,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
                   ),
                 );
               }).toList(),
             ),
           ),
         ),
-        const SizedBox(width: 10),
-        const Text("| ", style: TextStyle(color: Colors.white, fontSize: 20)),
+        const SizedBox(width: 5),
+        const Text("> ", style: TextStyle(color: Colors.white, fontSize: 20)),
         const Text("3", style: TextStyle(color: Colors.white)),
       ],
     );
@@ -251,10 +292,10 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
               selected: selectedExtras == event,
               onSelected: (_) {
                 setState(() {
-                  if (selectedWicket == event) {
-                    selectedWicket = null;
+                  if (selectedExtras == event) {
+                    selectedExtras = null;
                   } else {
-                    selectedWicket = event;
+                    selectedExtras = event;
                   }
                   widget.onChanged(selectedExtras, selectedWicket);
                 });
