@@ -131,8 +131,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
             const SizedBox(height: 16),
             EventRadioButtonGroup(
-              onChanged: (selectedEvent) {
-                debugPrint("Selected event: $selectedEvent");
+              onChanged: (selectedExtras, selectedWicket) {
+                debugPrint(
+                  "Extras: $selectedExtras, Wicket Event: $selectedWicket",
+                );
               },
             ),
 
@@ -222,7 +224,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 }
 
 class EventRadioButtonGroup extends StatefulWidget {
-  final void Function(String?) onChanged;
+  final void Function(String?, String?) onChanged;
 
   const EventRadioButtonGroup({super.key, required this.onChanged});
 
@@ -231,15 +233,10 @@ class EventRadioButtonGroup extends StatefulWidget {
 }
 
 class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
-  String? selectedEvent;
-  final List<String> allEvents = [
-    'Wide',
-    'No ball',
-    'Byes',
-    'Leg byes',
-    'Wicket',
-    'Run out',
-  ];
+  String? selectedExtras;
+  String? selectedWicket;
+  final List<String> extras = ['Wide', 'No ball', 'Byes', 'Leg byes'];
+  final List<String> wicketEvents = ['Wicket', 'Run out'];
 
   @override
   Widget build(BuildContext context) {
@@ -248,19 +245,23 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
         Wrap(
           spacing: 10,
           runSpacing: 8,
-          children: allEvents.take(4).map((event) {
+          children: extras.map((event) {
             return ChoiceChip(
               label: Text(event),
-              selected: selectedEvent == event,
+              selected: selectedExtras == event,
               onSelected: (_) {
                 setState(() {
-                  selectedEvent = event;
-                  widget.onChanged(selectedEvent);
+                  if (selectedWicket == event) {
+                    selectedWicket = null;
+                  } else {
+                    selectedWicket = event;
+                  }
+                  widget.onChanged(selectedExtras, selectedWicket);
                 });
               },
               selectedColor: Colors.green,
               labelStyle: TextStyle(
-                color: selectedEvent == event ? Colors.white : Colors.black,
+                color: selectedExtras == event ? Colors.white : Colors.black,
                 fontSize: 13,
               ),
               backgroundColor: Colors.white,
@@ -275,19 +276,23 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
         Wrap(
           spacing: 10,
           runSpacing: 8,
-          children: allEvents.skip(4).map((event) {
+          children: wicketEvents.map((event) {
             return ChoiceChip(
               label: Text(event),
-              selected: selectedEvent == event,
+              selected: selectedWicket == event,
               onSelected: (_) {
                 setState(() {
-                  selectedEvent = event;
-                  widget.onChanged(selectedEvent);
+                  if (selectedWicket == event) {
+                    selectedWicket = null;
+                  } else {
+                    selectedWicket = event;
+                  }
+                  widget.onChanged(selectedExtras, selectedWicket);
                 });
               },
-              selectedColor: Colors.green,
+              selectedColor: Colors.red,
               labelStyle: TextStyle(
-                color: selectedEvent == event ? Colors.white : Colors.black,
+                color: selectedWicket == event ? Colors.white : Colors.black,
                 fontSize: 13,
               ),
               backgroundColor: Colors.white,
@@ -302,7 +307,6 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
     );
   }
 }
-
 
 
 // ElevatedButton(
