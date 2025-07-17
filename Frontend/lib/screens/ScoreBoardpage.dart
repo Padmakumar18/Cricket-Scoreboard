@@ -200,34 +200,47 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 customButton(
                   "Undo",
                   () {
+                    // showDialog(
+                    //   context: context,
+                    //   builder: (BuildContext context) {
+                    //     return AlertDialog(
+                    //       title: const Text("Confirm Undo"),
+                    //       content: const Text(
+                    //         "Are you sure you want to undo the last action?",
+                    //       ),
+                    //       actions: [
+                    //         TextButton(
+                    //           onPressed: () {
+                    //             Navigator.of(
+                    //               context,
+                    //             ).pop(); // Close dialog without action
+                    //           },
+                    //           child: const Text("No"),
+                    //         ),
+                    //         TextButton(
+                    //           onPressed: () {
+                    //             Navigator.of(context).pop(); // Close dialog
+                    //             // TODO: Implement your undo logic here
+                    //             debugPrint("Undo confirmed.");
+                    //           },
+                    //           child: const Text("Yes"),
+                    //         ),
+                    //       ],
+                    //     );
+                    //   },
+                    // );
                     showDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text("Confirm Undo"),
-                          content: const Text(
-                            "Are you sure you want to undo the last action?",
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(
-                                  context,
-                                ).pop(); // Close dialog without action
-                              },
-                              child: const Text("No"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Close dialog
-                                // TODO: Implement your undo logic here
-                                debugPrint("Undo confirmed.");
-                              },
-                              child: const Text("Yes"),
-                            ),
-                          ],
-                        );
-                      },
+                      builder: (context) => MatchResultDialog(
+                        winningTeam: "Team A",
+                        losingTeam: "Team B",
+                        onStartNewMatch: () {
+                          // Reset state / Navigate to home
+                        },
+                        onViewScorecard: () {
+                          // Navigate to scorecard screen
+                        },
+                      ),
                     );
                   },
                   color: const Color.fromARGB(255, 250, 98, 131),

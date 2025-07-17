@@ -135,3 +135,88 @@ class _NewBowlerDialogState extends State<NewBowlerDialog> {
     );
   }
 }
+
+class MatchResultDialog extends StatelessWidget {
+  final String winningTeam;
+  final String losingTeam;
+  final VoidCallback onStartNewMatch;
+  final VoidCallback onViewScorecard;
+
+  const MatchResultDialog({
+    super.key,
+    required this.winningTeam,
+    required this.losingTeam,
+    required this.onStartNewMatch,
+    required this.onViewScorecard,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      title: const Text(
+        "🏁 Match Result",
+        style: TextStyle(color: Colors.black),
+        textAlign: TextAlign.center,
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "$winningTeam won the match!",
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            "Better luck next time, $losingTeam.",
+            style: const TextStyle(
+              fontSize: 16,
+              fontStyle: FontStyle.italic,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                onPressed: onViewScorecard,
+                icon: const Icon(Icons.insert_chart),
+                label: const Text("View Scorecard"),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: const BorderSide(color: Colors.black),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: onStartNewMatch,
+                icon: const Icon(Icons.replay),
+                label: const Text("Start New Match"),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.black,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
