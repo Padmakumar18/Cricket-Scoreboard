@@ -145,8 +145,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 );
               },
             ),
+            const Divider(color: Colors.white70),
 
-            const SizedBox(height: 16),
+            // const SizedBox(height: 16),
             Column(
               children: [
                 Wrap(
@@ -246,7 +247,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     Color textColor = Colors.black,
   }) {
     return SizedBox(
-      height: 50,
+      height: 40,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -363,78 +364,81 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
   String? selectedWicket;
   final List<String> extras = ['Wide', 'No ball', 'Byes', 'Leg byes'];
   final List<String> wicketEvents = ['Wicket', 'Run out'];
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Wrap(
-          spacing: 10,
-          runSpacing: 8,
-          children: extras.map((event) {
-            return ChoiceChip(
-              label: Text(event),
-              selected: selectedExtras == event,
-              onSelected: (_) {
-                setState(() {
-                  if (selectedExtras == event) {
-                    selectedExtras = null;
-                  } else {
-                    selectedExtras = event;
-                  }
-                  widget.onChanged(selectedExtras, selectedWicket);
-                });
-              },
-              selectedColor: Colors.green,
-              labelStyle: TextStyle(
-                color: selectedExtras == event ? Colors.white : Colors.black,
-                fontSize: 15,
-              ),
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-                side: const BorderSide(color: Colors.grey),
-              ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 10,
-          runSpacing: 8,
-          children: wicketEvents.map((event) {
-            return ChoiceChip(
-              label: Text(event),
-              selected: selectedWicket == event,
-              onSelected: (_) {
-                setState(() {
-                  if (selectedWicket == event) {
-                    selectedWicket = null;
-                  } else {
-                    selectedWicket = event;
-                  }
-                  widget.onChanged(selectedExtras, selectedWicket);
-                });
-              },
-              selectedColor: Colors.red,
-              labelStyle: TextStyle(
-                color: selectedWicket == event ? Colors.white : Colors.black,
-                fontSize: 15,
-              ),
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-                side: const BorderSide(color: Colors.grey),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: extras.map((event) {
+                return ChoiceChip(
+                  label: Text(event),
+                  selected: selectedExtras == event,
+                  onSelected: (_) {
+                    setState(() {
+                      selectedExtras = selectedExtras == event ? null : event;
+                      widget.onChanged(selectedExtras, selectedWicket);
+                    });
+                  },
+                  selectedColor: Colors.green,
+                  labelStyle: TextStyle(
+                    color: selectedExtras == event
+                        ? Colors.white
+                        : Colors.black,
+                    fontSize: 14,
+                  ),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    side: const BorderSide(color: Colors.grey),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: wicketEvents.map((event) {
+                return ChoiceChip(
+                  label: Text(event),
+                  selected: selectedWicket == event,
+                  onSelected: (_) {
+                    setState(() {
+                      selectedWicket = selectedWicket == event ? null : event;
+                      widget.onChanged(selectedExtras, selectedWicket);
+                    });
+                  },
+                  selectedColor: Colors.red,
+                  labelStyle: TextStyle(
+                    color: selectedWicket == event
+                        ? Colors.white
+                        : Colors.black,
+                    fontSize: 15,
+                  ),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    side: const BorderSide(color: Colors.grey),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
-
-
 
 
 // ElevatedButton(
