@@ -146,7 +146,89 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               },
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            Column(
+              children: [
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    ...['0', '1', '2', '3', '4', '5', '6'].map((run) {
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width / 4 - 20,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            debugPrint("Run selected: $run");
+                            // TODO: Add run logic
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            shape: const CircleBorder(),
+                            padding: const EdgeInsets.all(18),
+                          ),
+                          child: Text(
+                            run,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width / 4 - 20,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) {
+                              final controller = TextEditingController();
+                              return AlertDialog(
+                                title: const Text("Enter More Runs"),
+                                content: TextField(
+                                  controller: controller,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    hintText: "Enter runs > 6",
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      if (controller.text.isNotEmpty) {
+                                        debugPrint(
+                                          "More run: ${controller.text}",
+                                        );
+                                        // TODO: Handle more run logic
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("OK"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(18),
+                        ),
+                        child: const Text(
+                          "More",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -210,7 +292,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 }
 
                 bool isDotBall = run == "0";
-                bool isLongText = run.length > 3;
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -348,6 +429,8 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
     );
   }
 }
+
+
 
 
 // ElevatedButton(
