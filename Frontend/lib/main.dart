@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Frontend/screens/LoginPage.dart';
 import 'package:Frontend/screens/SignupPage.dart';
-import 'package:Frontend/screens/MainPage.dart';
+import 'package:Frontend/screens/GetMatchDetails.dart';
 import 'package:Frontend/screens/ScoreBoardpage.dart';
 
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
@@ -32,9 +32,13 @@ class MyApp extends StatelessWidget {
             '/LoginPage': (context) =>
                 const LoginPage(emailId: '', password: ''),
             '/SignupPage': (context) => const SignupPage(),
-            '/MainPage': (context) => const MainPage(),
-            '/ScoreBoardpage': (context) =>
-                const ScoreBoardPage(teamA: "", teamB: ""),
+            '/GetMatchDetails': (context) => const GetMatchDetails(),
+            '/ScoreBoardpage': (context) => const ScoreBoardPage(
+              teamA: "",
+              teamB: "",
+              battingTeam: "",
+              bowlingTeam: "",
+            ),
           },
         );
       },

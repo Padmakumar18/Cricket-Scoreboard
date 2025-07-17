@@ -1,20 +1,24 @@
 import 'package:Frontend/screens/ScoreBoardpage.dart';
 import 'package:flutter/material.dart';
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+class GetMatchDetails extends StatefulWidget {
+  const GetMatchDetails({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<GetMatchDetails> createState() => _GetMatchDetailsState();
 }
 
 enum TossDecision { bat, bowl }
 
-class _MainPageState extends State<MainPage> {
+class _GetMatchDetailsState extends State<GetMatchDetails> {
   late String teamA;
   late String teamB;
   late String overs;
   late String playersCount;
+
+  // Is this required?
+  late String battingTeam;
+  late String bowlingTeam;
 
   late TextEditingController teamAController;
   late TextEditingController teamBController;
@@ -50,7 +54,11 @@ class _MainPageState extends State<MainPage> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Match Setup")),
+      // backgroundColor: Color.fromARGB(255, 0, 50, 90),
+      appBar: AppBar(
+        title: const Text("Match Setup"),
+        // backgroundColor: const Color.fromARGB(255, 0, 50, 90),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -146,6 +154,25 @@ class _MainPageState extends State<MainPage> {
                     overs = oversController.text;
                     playersCount = playersCountController.text;
 
+                    // bowlingTeam =
+                    //     tossWonBy == teamA && chooseTo == TossDecision.bat
+                    //     ? teamBController.text
+                    //     : teamAController.text;
+                    // battingTeam = bowlingTeam == teamA ? teamB : teamA;
+
+                    switch (chooseTo) {
+                      case TossDecision.bat:
+                        battingTeam = tossWonBy == teamA ? teamA : teamB;
+                        bowlingTeam = tossWonBy == teamA ? teamB : teamA;
+                        break;
+                      case TossDecision.bowl:
+                        bowlingTeam = tossWonBy == teamA ? teamA : teamB;
+                        battingTeam = tossWonBy == teamA ? teamB : teamA;
+                        break;
+                      default:
+                        battingTeam = 'Team A';
+                        bowlingTeam = 'Team B';
+                    }
                     print('Team A: $teamA');
                     print('Team B: $teamB');
                     print('Overs: $overs');
@@ -164,13 +191,14 @@ class _MainPageState extends State<MainPage> {
                       tossWonBy = null;
                       chooseTo = null;
                     });
-                    // Inside MainPage's onPressed for 'Start Match'
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ScoreBoardPage(
                           teamA: teamAController.text,
                           teamB: teamBController.text,
+                          battingTeam: battingTeam,
+                          bowlingTeam: bowlingTeam,
                         ),
                       ),
                     );
