@@ -55,6 +55,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     ),
   ];
 
+  int strikerBatmansIndex = 0;
+
   @override
   void initState() {
     title = '${widget.teamA} vs ${widget.teamB}';
@@ -167,3 +169,29 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     );
   }
 }
+
+
+// ElevatedButton(
+//               onPressed: () {
+//                 setState(() {
+//                   final current = batsmen[strikerBatmansIndex];
+
+//                   final updatedRuns = current.runs + 1;
+//                   final updatedBalls = current.balls + 1;
+//                   final updatedStrikeRate = updatedBalls > 0
+//                       ? (updatedRuns / updatedBalls) * 100
+//                       : 0.0;
+
+//                   batsmen[strikerBatmansIndex] = BatsmanStats(
+//                     name: current.name,
+//                     runs: updatedRuns,
+//                     balls: updatedBalls,
+//                     fours: current.fours,
+//                     sixes: current.sixes,
+//                     strikeRate: updatedStrikeRate,
+//                   );
+//                 });
+//               },
+
+//               child: const Text("Add run for batsman"),
+//             ),
