@@ -38,6 +38,12 @@ class _PlayerEntryDialogState extends State<PlayerEntryDialog> {
       actions: [
         TextButton(
           onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () {
             widget.onSubmit(
               _strikerController.text,
               _nonStrikerController.text,
@@ -75,6 +81,12 @@ class _NewBatterDialogState extends State<NewBatterDialog> {
       actions: [
         TextButton(
           onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () {
             widget.onSubmit(_batterController.text);
             Navigator.of(context).pop();
           },
@@ -106,6 +118,12 @@ class _NewBowlerDialogState extends State<NewBowlerDialog> {
         decoration: const InputDecoration(labelText: "Enter Bowler Name"),
       ),
       actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("Cancel"),
+        ),
         TextButton(
           onPressed: () {
             widget.onSubmit(_bowlerController.text);

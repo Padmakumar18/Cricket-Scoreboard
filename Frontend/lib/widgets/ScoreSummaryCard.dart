@@ -91,7 +91,7 @@ const headerStyle = TextStyle(
 const statStyle = TextStyle(color: Colors.white, fontSize: 12);
 
 class BatsmanStats {
-  final String name;
+  late String name;
   final int runs;
   final int balls;
   final int fours;
@@ -109,7 +109,7 @@ class BatsmanStats {
 }
 
 class BowlerStats {
-  final String name;
+  late String name;
   final int overs;
   final int maidens;
   final int runs;

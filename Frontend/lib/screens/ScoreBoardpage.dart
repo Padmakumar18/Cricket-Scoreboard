@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Frontend/widgets/ScoreSummaryCard.dart';
+import 'package:Frontend/widgets/OnFieldPlayersCard.dart';
 
 class ScoreBoardPage extends StatefulWidget {
   final String teamA;
@@ -16,6 +17,30 @@ class ScoreBoardPage extends StatefulWidget {
     required this.bowlingTeam,
     this.isFirstInnings = true,
   });
+
+  //   @override
+  // void initState() {
+  //   super.initState();
+  //   title = '${widget.teamA} vs ${widget.teamB}';
+
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     showDialog(
+  //       context: context,
+  //       builder: (context) => PlayerEntryDialog(
+  //         onSubmit: (striker, nonStriker, bowler) {
+  //           // Update your state or models here
+  //           debugPrint("Striker: $striker, Non-Striker: $nonStriker, Bowler: $bowler");
+
+  //           setState(() {
+  //             batsmen[0].name = "$striker*";
+  //             batsmen[1].name = nonStriker;
+  //             bowlers[0].name = bowler;
+  //           });
+  //         },
+  //       ),
+  //     );
+  //   });
+  // }
 
   @override
   State<ScoreBoardPage> createState() => _ScoreBoardPageState();
@@ -68,11 +93,31 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   ];
 
   int strikerBatmansIndex = 0;
+  bool isWicketFallen = false;
 
   @override
   void initState() {
-    title = '${widget.teamA} vs ${widget.teamB}';
     super.initState();
+    title = '${widget.teamA} vs ${widget.teamB}';
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (context) => PlayerEntryDialog(
+          onSubmit: (striker, nonStriker, bowler) {
+            debugPrint(
+              "Striker: $striker, Non-Striker: $nonStriker, Bowler: $bowler",
+            );
+
+            setState(() {
+              batsmen[0].name = "$striker*";
+              batsmen[1].name = nonStriker;
+              bowlers[0].name = bowler;
+            });
+          },
+        ),
+      );
+    });
   }
 
   @override
@@ -125,12 +170,66 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               spacing: 10,
               runSpacing: 8,
               children: [
-                customButton("Retire", () {}),
-                customButton("Swap striker", () {}),
-                customButton("End over", () {}),
+                customButton("Retire", () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => NewBatterDialog(
+                      onSubmit: (batterName) {
+                        debugPrint("New Batter after Retire: $batterName");
+                        // TODO: Update state with new batter
+                      },
+                    ),
+                  );
+                }),
+                customButton("Swap striker", () {
+                  setState(() {
+                    strikerBatmansIndex = strikerBatmansIndex == 0 ? 1 : 0;
+                  });
+                }),
+                customButton("End over", () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => NewBowlerDialog(
+                      onSubmit: (batterName) {
+                        debugPrint("New Bowler after End Over: $batterName");
+                        // TODO: Add new batter to batsmen list or update index
+                      },
+                    ),
+                  );
+                }),
                 customButton(
                   "Undo",
-                  () {},
+                  () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Confirm Undo"),
+                          content: const Text(
+                            "Are you sure you want to undo the last action?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(
+                                  context,
+                                ).pop(); // Close dialog without action
+                              },
+                              child: const Text("No"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close dialog
+                                // TODO: Implement your undo logic here
+                                debugPrint("Undo confirmed.");
+                              },
+                              child: const Text("Yes"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                   color: const Color.fromARGB(255, 250, 98, 131),
                   textColor: Colors.white,
                 ),
@@ -143,6 +242,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 debugPrint(
                   "Extras: $selectedExtras, Wicket Event: $selectedWicket",
                 );
+                setState(() {
+                  isWicketFallen =
+                      selectedWicket == "Wicket" || selectedWicket == "Run Out";
+                });
               },
             ),
             const Divider(color: Colors.white70),
@@ -160,7 +263,29 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             debugPrint("Run selected: $run");
-                            // TODO: Add run logic
+                            // TODO: Apply run logic here
+
+                            if (isWicketFallen) {
+                              Future.delayed(
+                                const Duration(milliseconds: 300),
+                                () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => NewBatterDialog(
+                                      onSubmit: (batterName) {
+                                        debugPrint(
+                                          "New Batter after run $run: $batterName",
+                                        );
+                                      },
+                                    ),
+                                  ).then((_) {
+                                    setState(() {
+                                      isWicketFallen = false;
+                                    });
+                                  });
+                                },
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -177,6 +302,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                         ),
                       );
                     }).toList(),
+                    // "More" button
                     SizedBox(
                       width: MediaQuery.of(context).size.width / 4 - 20,
                       child: ElevatedButton(
@@ -206,7 +332,30 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                                           "More run: ${controller.text}",
                                         );
                                         // TODO: Handle more run logic
+
+                                        if (isWicketFallen) {
+                                          Future.delayed(
+                                            const Duration(milliseconds: 300),
+                                            () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (_) => NewBatterDialog(
+                                                  onSubmit: (batterName) {
+                                                    debugPrint(
+                                                      "New Batter after more run: $batterName",
+                                                    );
+                                                  },
+                                                ),
+                                              ).then((_) {
+                                                setState(() {
+                                                  isWicketFallen = false;
+                                                });
+                                              });
+                                            },
+                                          );
+                                        }
                                       }
+
                                       Navigator.pop(context);
                                     },
                                     child: const Text("OK"),
