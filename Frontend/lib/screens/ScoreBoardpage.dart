@@ -22,7 +22,18 @@ class ScoreBoardPage extends StatefulWidget {
 }
 
 class _ScoreBoardPageState extends State<ScoreBoardPage> {
-  List<String> thisOverRuns = ["W", "1", "2", "0"];
+  List<String> thisOverRuns = [
+    "W",
+    "1",
+    "2",
+    "0",
+    "4",
+    "1",
+    "W",
+    "6",
+    "0",
+    "1",
+  ];
   late String title;
 
   List<BatsmanStats> batsmen = [
@@ -75,12 +86,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Text(
-            //   widget.battingTeam,
-            //   style: const TextStyle(fontSize: 20, color: Colors.white),
-            //   textAlign: TextAlign.center,
-            // ),
-            // const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
@@ -98,7 +103,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                infoChip("Target: 200"),
+                infoChip("Target: -"),
                 const SizedBox(width: 10),
                 infoChip("CRR: 10.0"),
               ],
@@ -106,8 +111,56 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             const SizedBox(height: 12),
             thisOverWidget(thisOverRuns),
             ScoreSummaryCard(batsmen: batsmen, bowlers: bowlers),
+
+            // Primary Button Row
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: [
+                customButton("Retire", () {}),
+                customButton("Swap Striker", () {}),
+                customButton("End Over", () {}),
+                customButton(
+                  "Undo",
+                  () {},
+                  color: const Color.fromARGB(255, 250, 98, 131),
+                  textColor: Colors.white,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+            EventRadioButtonGroup(
+              onChanged: (selectedEvent) {
+                debugPrint("Selected event: $selectedEvent");
+              },
+            ),
+
+            const SizedBox(height: 24),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget customButton(
+    String label,
+    VoidCallback onPressed, {
+    Color color = Colors.white,
+    Color textColor = Colors.black,
+  }) {
+    return SizedBox(
+      height: 40,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          minimumSize: const Size(70, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          textStyle: const TextStyle(fontSize: 13),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        ),
+        child: Text(label, style: TextStyle(color: textColor)),
       ),
     );
   }
@@ -161,14 +214,95 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           ),
         ),
         const SizedBox(width: 10),
-        const Text(
-          "| 3",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        const Text("| ", style: TextStyle(color: Colors.white, fontSize: 20)),
+        const Text("3", style: TextStyle(color: Colors.white)),
+      ],
+    );
+  }
+}
+
+class EventRadioButtonGroup extends StatefulWidget {
+  final void Function(String?) onChanged;
+
+  const EventRadioButtonGroup({super.key, required this.onChanged});
+
+  @override
+  State<EventRadioButtonGroup> createState() => _EventRadioButtonGroupState();
+}
+
+class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
+  String? selectedEvent;
+  final List<String> allEvents = [
+    'Wide',
+    'No ball',
+    'Byes',
+    'Leg byes',
+    'Wicket',
+    'Run out',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Wrap(
+          spacing: 10,
+          runSpacing: 8,
+          children: allEvents.take(4).map((event) {
+            return ChoiceChip(
+              label: Text(event),
+              selected: selectedEvent == event,
+              onSelected: (_) {
+                setState(() {
+                  selectedEvent = event;
+                  widget.onChanged(selectedEvent);
+                });
+              },
+              selectedColor: Colors.green,
+              labelStyle: TextStyle(
+                color: selectedEvent == event ? Colors.white : Colors.black,
+                fontSize: 13,
+              ),
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: const BorderSide(color: Colors.grey),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 10,
+          runSpacing: 8,
+          children: allEvents.skip(4).map((event) {
+            return ChoiceChip(
+              label: Text(event),
+              selected: selectedEvent == event,
+              onSelected: (_) {
+                setState(() {
+                  selectedEvent = event;
+                  widget.onChanged(selectedEvent);
+                });
+              },
+              selectedColor: Colors.green,
+              labelStyle: TextStyle(
+                color: selectedEvent == event ? Colors.white : Colors.black,
+                fontSize: 13,
+              ),
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: const BorderSide(color: Colors.grey),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
   }
 }
+
 
 
 // ElevatedButton(
