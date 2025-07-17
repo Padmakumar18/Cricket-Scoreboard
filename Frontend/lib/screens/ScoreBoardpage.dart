@@ -200,47 +200,34 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 customButton(
                   "Undo",
                   () {
-                    // showDialog(
-                    //   context: context,
-                    //   builder: (BuildContext context) {
-                    //     return AlertDialog(
-                    //       title: const Text("Confirm Undo"),
-                    //       content: const Text(
-                    //         "Are you sure you want to undo the last action?",
-                    //       ),
-                    //       actions: [
-                    //         TextButton(
-                    //           onPressed: () {
-                    //             Navigator.of(
-                    //               context,
-                    //             ).pop(); // Close dialog without action
-                    //           },
-                    //           child: const Text("No"),
-                    //         ),
-                    //         TextButton(
-                    //           onPressed: () {
-                    //             Navigator.of(context).pop(); // Close dialog
-                    //             // TODO: Implement your undo logic here
-                    //             debugPrint("Undo confirmed.");
-                    //           },
-                    //           child: const Text("Yes"),
-                    //         ),
-                    //       ],
-                    //     );
-                    //   },
-                    // );
                     showDialog(
                       context: context,
-                      builder: (context) => MatchResultDialog(
-                        winningTeam: "Team A",
-                        losingTeam: "Team B",
-                        onStartNewMatch: () {
-                          // Reset state / Navigate to home
-                        },
-                        onViewScorecard: () {
-                          // Navigate to scorecard screen
-                        },
-                      ),
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Confirm Undo"),
+                          content: const Text(
+                            "Are you sure you want to undo the last action?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(
+                                  context,
+                                ).pop(); // Close dialog without action
+                              },
+                              child: const Text("No"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close dialog
+                                // TODO: Implement your undo logic here
+                                debugPrint("Undo confirmed.");
+                              },
+                              child: const Text("Yes"),
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                   color: const Color.fromARGB(255, 250, 98, 131),
@@ -595,6 +582,8 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
 }
 
 
+//// ---------------- This is for update batsman runs and balls -------------------
+
 // ElevatedButton(
 //               onPressed: () {
 //                 setState(() {
@@ -619,3 +608,32 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
 
 //               child: const Text("Add run for batsman"),
 //             ),
+
+
+
+/// ------------------- This is for testing purposes only -------------------
+                    // showDialog(
+                    //   context: context,
+                    //   barrierDismissible: true, // allow tapping outside
+                    //   builder: (context) => MatchResultDialog(
+                    //     winningTeam: "Challengers",
+                    //     losingTeam: "Warriors",
+                    //     onStartNewMatch: () {
+                    //       Navigator.pushNamedAndRemoveUntil(
+                    //         context,
+                    //         '/start',
+                    //         (route) => false,
+                    //       );
+                    //     },
+                    //     onViewScorecard: () {
+                    //       Navigator.pushNamed(context, '/scorecard');
+                    //     },
+                    //   ),
+                    // ).then((_) {
+                    //   // If dialog is closed without using the buttons
+                    //   Navigator.pushNamedAndRemoveUntil(
+                    //     context,
+                    //     '/home',
+                    //     (route) => false,
+                    //   );
+                    // });
