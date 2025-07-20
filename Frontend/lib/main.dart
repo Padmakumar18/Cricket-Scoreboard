@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData(brightness: Brightness.dark),
           themeMode: mode,
-          initialRoute: '/ScoreBoardpage',
+          initialRoute: '/GetMatchDetails',
           routes: {
             '/': (context) => const LoginPage(emailId: '', password: ''),
             '/LoginPage': (context) =>
