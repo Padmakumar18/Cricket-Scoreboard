@@ -9,6 +9,8 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
+  final _phoneFieldKey =
+      GlobalKey<FormFieldState>(); // ✅ Unique key for phone field
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
@@ -35,24 +37,24 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _sendOtp() {
-    final number = _numberController.text.trim();
-    if (number.length == 10) {
-      // TODO: Call backend API to send OTP
+    final isPhoneValid = _phoneFieldKey.currentState?.validate() ?? false;
+
+    if (isPhoneValid) {
+      final number = _numberController.text.trim();
       print('OTP sent to $number');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('OTP sent to $number')));
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Enter valid phone number')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid phone number')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: const Text('Signup'), centerTitle: true),
       appBar: AppBar(title: const Text('Signup')),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -64,12 +66,12 @@ class _SignupPageState extends State<SignupPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Name'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Enter your name' : null,
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? 'Enter your name'
+                    : null,
               ),
               const SizedBox(height: 16),
 
-              // Password Field
               TextFormField(
                 controller: _passwordController,
                 decoration: const InputDecoration(labelText: 'Password'),
@@ -80,21 +82,23 @@ class _SignupPageState extends State<SignupPage> {
               ),
               const SizedBox(height: 16),
 
-              // Phone Number Field with Send OTP Button
               Row(
                 children: [
                   Expanded(
                     flex: 2,
                     child: TextFormField(
+                      key: _phoneFieldKey,
                       controller: _numberController,
                       decoration: const InputDecoration(
                         labelText: 'Phone Number',
                       ),
                       keyboardType: TextInputType.phone,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Enter phone number';
-                        } else if (value.length != 10) {
+                        } else if (!RegExp(
+                          r'^[0-9]{10}$',
+                        ).hasMatch(value.trim())) {
                           return 'Phone number must be 10 digits';
                         }
                         return null;
@@ -116,36 +120,34 @@ class _SignupPageState extends State<SignupPage> {
                 decoration: const InputDecoration(labelText: 'Enter OTP'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.trim().isEmpty) {
                     return 'Enter OTP';
-                  } else if (value.length != 6) {
-                    return 'Enter valid OTP';
+                  } else if (value.trim().length != 6) {
+                    return 'Enter valid 6-digit OTP';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 20),
+
+              // Action Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SizedBox(
-                    child: ElevatedButton(
-                      onPressed: _handleSubmit,
-                      child: const Text('Sign Up'),
-                    ),
+                  ElevatedButton(
+                    onPressed: _handleSubmit,
+                    child: const Text('Sign Up'),
                   ),
-                  Text("or"),
-                  SizedBox(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _nameController.clear();
-                        _numberController.clear();
-                        _passwordController.clear();
-                        _otpController.clear();
-                        Navigator.pushReplacementNamed(context, '/LoginPage');
-                      },
-                      child: const Text('Login'),
-                    ),
+                  const Text("or"),
+                  ElevatedButton(
+                    onPressed: () {
+                      _nameController.clear();
+                      _numberController.clear();
+                      _passwordController.clear();
+                      _otpController.clear();
+                      Navigator.pushReplacementNamed(context, '/LoginPage');
+                    },
+                    child: const Text('Login'),
                   ),
                 ],
               ),
