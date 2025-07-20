@@ -26,11 +26,11 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData(brightness: Brightness.dark),
           themeMode: mode,
-          initialRoute: '/GetMatchDetails',
+          initialRoute: '/LoginPage',
           routes: {
-            '/': (context) => const LoginPage(emailId: '', password: ''),
+            '/': (context) => const LoginPage(userName: '', password: ''),
             '/LoginPage': (context) =>
-                const LoginPage(emailId: '', password: ''),
+                const LoginPage(userName: '', password: ''),
             '/SignupPage': (context) => const SignupPage(),
             '/GetMatchDetails': (context) => const GetMatchDetails(),
             '/ScoreBoardpage': (context) => const ScoreBoardPage(
