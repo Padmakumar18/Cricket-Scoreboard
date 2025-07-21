@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class ScoreSummaryCard extends StatelessWidget {
   final List<BatsmanStats> batsmen;
   final List<BowlerStats> bowlers;
+  final int strikerIndex;
 
   const ScoreSummaryCard({
     super.key,
     required this.batsmen,
     required this.bowlers,
+    required this.strikerIndex,
   });
 
   @override
@@ -36,8 +38,14 @@ class ScoreSummaryCard extends StatelessWidget {
                   children: [
                     Expanded(
                       flex: 3,
-                      child: Text(batsman.name, style: statStyle),
+                      child: Text(
+                        strikerIndex == batsmen.indexOf(batsman)
+                            ? "${batsman.name}*" // Add asterisk for striker
+                            : batsman.name,
+                        style: statStyle,
+                      ),
                     ),
+
                     Expanded(child: Text("${batsman.runs}", style: statStyle)),
                     Expanded(child: Text("${batsman.balls}", style: statStyle)),
                     Expanded(child: Text("${batsman.fours}", style: statStyle)),
@@ -101,11 +109,11 @@ const statStyle = TextStyle(color: Colors.white, fontSize: 12);
 
 class BatsmanStats {
   late String name;
-  final int runs;
-  final int balls;
-  final int fours;
-  final int sixes;
-  final double strikeRate;
+  int runs;
+  int balls;
+  int fours;
+  int sixes;
+  double strikeRate;
 
   BatsmanStats({
     required this.name,
@@ -119,11 +127,11 @@ class BatsmanStats {
 
 class BowlerStats {
   late String name;
-  final int overs;
-  final int maidens;
-  final int runs;
-  final int wickets;
-  final double economy;
+  int overs;
+  int maidens;
+  int runs;
+  int wickets;
+  double economy;
 
   BowlerStats({
     required this.name,
