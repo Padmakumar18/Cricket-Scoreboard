@@ -3,62 +3,40 @@ import 'package:Frontend/widgets/ScoreSummaryCard.dart';
 import 'package:Frontend/widgets/OnFieldPlayersCard.dart';
 
 class ScoreBoardPage extends StatefulWidget {
-  final String teamA;
-  final String teamB;
   final String battingTeam;
   final String bowlingTeam;
+  final int totalOvers;
+  final int playersCount;
+
   final bool isFirstInnings;
 
   const ScoreBoardPage({
     super.key,
-    required this.teamA,
-    required this.teamB,
     required this.battingTeam,
     required this.bowlingTeam,
+    required this.totalOvers,
+    required this.playersCount,
     this.isFirstInnings = true,
   });
-
-  //   @override
-  // void initState() {
-  //   super.initState();
-  //   title = '${widget.teamA} vs ${widget.teamB}';
-
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     showDialog(
-  //       context: context,
-  //       builder: (context) => PlayerEntryDialog(
-  //         onSubmit: (striker, nonStriker, bowler) {
-  //           // Update your state or models here
-  //           debugPrint("Striker: $striker, Non-Striker: $nonStriker, Bowler: $bowler");
-
-  //           setState(() {
-  //             batsmen[0].name = "$striker*";
-  //             batsmen[1].name = nonStriker;
-  //             bowlers[0].name = bowler;
-  //           });
-  //         },
-  //       ),
-  //     );
-  //   });
-  // }
 
   @override
   State<ScoreBoardPage> createState() => _ScoreBoardPageState();
 }
 
 class _ScoreBoardPageState extends State<ScoreBoardPage> {
-  List<String> thisOverRuns = [
-    "wd",
-    "lb2",
-    "wk",
-    "1",
-    "nb5",
-    "wd-ro-1",
-    "W",
-    "6",
-    "0",
-    "4",
-  ];
+  List<String> thisOverRuns = [];
+  int over = 0;
+  int remainingBalls = 6;
+  int thisOverRunsCount = 0;
+
+  int runs = 0;
+  int wickets = 0;
+
+  int target = 0;
+  double currentRunRate = 0.0;
+
+  int strikerBatmansIndex = 0;
+  bool isWicketFallen = false;
 
   late String title;
 
@@ -92,13 +70,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     ),
   ];
 
-  int strikerBatmansIndex = 0;
-  bool isWicketFallen = false;
-
   @override
   void initState() {
     super.initState();
-    title = '${widget.teamA} vs ${widget.teamB}';
+    title = '${widget.battingTeam} vs ${widget.bowlingTeam}';
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(
@@ -134,14 +109,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Text(
-                  "102/2",
+                  "$runs/$wickets",
                   style: TextStyle(fontSize: 50, color: Colors.white),
                 ),
                 SizedBox(width: 20),
                 Text(
-                  "10.2 Ov",
+                  '$over.${6 - remainingBalls} / ${widget.totalOvers} Ov',
                   style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
               ],
@@ -149,19 +124,25 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                infoChip("Target: -"),
+                infoChip(
+                  "Target : ${widget.isFirstInnings ? "-" : target + 1}",
+                ),
                 const SizedBox(width: 10),
-                infoChip("CRR: 10.0"),
+                infoChip("CRR : $currentRunRate"),
+                // const SizedBox(width: 10), write this in future
+                // infoChip("Req RR: 10.0"),
                 const SizedBox(width: 10),
-                infoChip("Req RR: 10.0"),
+                infoChip('Players count : ${widget.playersCount}'),
               ],
             ),
-            const SizedBox(height: 12),
-            const Text(
-              "34 runs needed in 36 overs",
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            // const SizedBox(height: 12),
+            if (!widget.isFirstInnings) ...[
+              const SizedBox(height: 12),
+              Text(
+                "${target - runs} runs needed in ${(widget.totalOvers * 6) - ((over * 6) + (6 - remainingBalls))} balls",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ],
+
             thisOverWidget(thisOverRuns),
             ScoreSummaryCard(batsmen: batsmen, bowlers: bowlers),
 
@@ -492,7 +473,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         ),
         const SizedBox(width: 5),
         const Text("> ", style: TextStyle(color: Colors.white, fontSize: 20)),
-        const Text("3", style: TextStyle(color: Colors.white)),
+        Text("$thisOverRunsCount", style: TextStyle(color: Colors.white)),
       ],
     );
   }

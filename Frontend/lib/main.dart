@@ -34,10 +34,10 @@ class MyApp extends StatelessWidget {
             '/SignupPage': (context) => const SignupPage(),
             '/GetMatchDetails': (context) => const GetMatchDetails(),
             '/ScoreBoardpage': (context) => const ScoreBoardPage(
-              teamA: "",
-              teamB: "",
               battingTeam: "",
               bowlingTeam: "",
+              totalOvers: 0,
+              playersCount: 0,
             ),
           },
         );

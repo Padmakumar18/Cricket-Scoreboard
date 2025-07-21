@@ -70,10 +70,10 @@ class _GetMatchDetailsState extends State<GetMatchDetails> {
         context,
         MaterialPageRoute(
           builder: (context) => ScoreBoardPage(
-            teamA: teamA,
-            teamB: teamB,
             battingTeam: battingTeam,
             bowlingTeam: bowlingTeam,
+            totalOvers: int.parse(overs),
+            playersCount: int.parse(playersCount),
           ),
         ),
       );
