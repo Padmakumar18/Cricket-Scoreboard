@@ -154,17 +154,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
     currentRunRate = run / ((over * 6) + (6 - remainingBalls));
     remainingBalls -= 1;
-    print("run");
-    print(run);
     over = remainingBalls == 0 ? over + 1 : over;
-    print("isFirstInnings");
-    print(isFirstInnings);
     if (over == widget.totalOvers && remainingBalls == 0) {
       isFirstInnings = false;
-      debugPrint("Over limit reached: $over");
       target = run + 1;
       resetScoreCard();
-      initState();
       return;
     }
     if (remainingBalls == 0) {
@@ -199,7 +193,15 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       bowlers.clear();
       strikerBatmansIndex = 0;
     });
-    showPlayerEntryDialog();
+    print(isFirstInnings);
+    if (!isFirstInnings) {
+      showPlayerEntryDialog();
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/GetMatchDetails',
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 
   @override
