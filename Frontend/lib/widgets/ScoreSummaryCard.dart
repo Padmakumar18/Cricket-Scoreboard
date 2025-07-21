@@ -30,22 +30,31 @@ class ScoreSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           ...batsmen.map((batsman) {
-            return Row(
+            return Column(
               children: [
-                Expanded(flex: 3, child: Text(batsman.name, style: statStyle)),
-                Expanded(child: Text("${batsman.runs}", style: statStyle)),
-                Expanded(child: Text("${batsman.balls}", style: statStyle)),
-                Expanded(child: Text("${batsman.fours}", style: statStyle)),
-                Expanded(child: Text("${batsman.sixes}", style: statStyle)),
-                Expanded(
-                  child: Text(
-                    "${batsman.strikeRate.toStringAsFixed(2)}",
-                    style: statStyle,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(batsman.name, style: statStyle),
+                    ),
+                    Expanded(child: Text("${batsman.runs}", style: statStyle)),
+                    Expanded(child: Text("${batsman.balls}", style: statStyle)),
+                    Expanded(child: Text("${batsman.fours}", style: statStyle)),
+                    Expanded(child: Text("${batsman.sixes}", style: statStyle)),
+                    Expanded(
+                      child: Text(
+                        "${batsman.strikeRate.toStringAsFixed(2)}",
+                        style: statStyle,
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 3),
               ],
             );
           }),
+
           const Divider(color: Colors.white70),
           Row(
             children: const [

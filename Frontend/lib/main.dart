@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData(brightness: Brightness.dark),
           themeMode: mode,
-          initialRoute: '/GetMatchDetails',
+          initialRoute: '/ScoreBoardpage',
           routes: {
             '/': (context) => const LoginPage(userName: '', password: ''),
             '/LoginPage': (context) =>
@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
             '/ScoreBoardpage': (context) => const ScoreBoardPage(
               battingTeam: "",
               bowlingTeam: "",
-              totalOvers: 0,
-              playersCount: 0,
+              totalOvers: 5,
+              playersCount: 6,
             ),
           },
         );

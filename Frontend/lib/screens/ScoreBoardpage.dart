@@ -40,35 +40,37 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
   late String title;
 
-  List<BatsmanStats> batsmen = [
-    BatsmanStats(
-      name: "Shikhar Dhawan*",
-      runs: 72,
-      balls: 39,
-      fours: 10,
-      sixes: 2,
-      strikeRate: 300.00,
-    ),
-    BatsmanStats(
-      name: "Virat Kohli",
-      runs: 26,
-      balls: 20,
-      fours: 2,
-      sixes: 1,
-      strikeRate: 100.00,
-    ),
-  ];
+  List<BatsmanStats> batsmen = [];
+  // List<BatsmanStats> batsmen = [
+  //   BatsmanStats(
+  //     name: "Shikhar Dhawan*",
+  //     runs: 72,
+  //     balls: 39,
+  //     fours: 10,
+  //     sixes: 2,
+  //     strikeRate: 300.00,
+  //   ),
+  //   BatsmanStats(
+  //     name: "Virat Kohli",
+  //     runs: 26,
+  //     balls: 20,
+  //     fours: 2,
+  //     sixes: 1,
+  //     strikeRate: 100.00,
+  //   ),
+  // ];
 
-  List<BowlerStats> bowlers = [
-    BowlerStats(
-      name: "Bhuvneshwar Kumar",
-      overs: 4,
-      maidens: 0,
-      runs: 24,
-      wickets: 5,
-      economy: 18.00,
-    ),
-  ];
+  List<BowlerStats> bowlers = [];
+  // List<BowlerStats> bowlers = [
+  //   BowlerStats(
+  //     name: "Bhuvneshwar Kumar",
+  //     overs: 4,
+  //     maidens: 0,
+  //     runs: 24,
+  //     wickets: 5,
+  //     economy: 18.00,
+  //   ),
+  // ];
 
   @override
   void initState() {
@@ -78,16 +80,51 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (context) => PlayerEntryDialog(
           onSubmit: (striker, nonStriker, bowler) {
             debugPrint(
               "Striker: $striker, Non-Striker: $nonStriker, Bowler: $bowler",
             );
-
             setState(() {
-              batsmen[0].name = "$striker*";
-              batsmen[1].name = nonStriker;
-              bowlers[0].name = bowler;
+              if (batsmen.length < 2) {
+                batsmen = [
+                  BatsmanStats(
+                    name: "$striker*",
+                    runs: 0,
+                    balls: 0,
+                    fours: 0,
+                    sixes: 0,
+                    strikeRate: 0,
+                  ),
+                  BatsmanStats(
+                    name: nonStriker,
+                    runs: 0,
+                    balls: 0,
+                    fours: 0,
+                    sixes: 0,
+                    strikeRate: 0,
+                  ),
+                ];
+              } else {
+                batsmen[0].name = "$striker*";
+                batsmen[1].name = nonStriker;
+              }
+
+              if (bowlers.isEmpty) {
+                bowlers = [
+                  BowlerStats(
+                    name: bowler,
+                    overs: 0,
+                    maidens: 0,
+                    runs: 0,
+                    wickets: 0,
+                    economy: 0.0,
+                  ),
+                ];
+              } else {
+                bowlers[0].name = bowler;
+              }
             });
           },
         ),
@@ -135,18 +172,17 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 infoChip('Players count : ${widget.playersCount}'),
               ],
             ),
-            if (!widget.isFirstInnings) ...[
+            if (!widget.isFirstInnings && target > runs) ...[
               const SizedBox(height: 12),
               Text(
                 "${target - runs} runs needed in ${(widget.totalOvers * 6) - ((over * 6) + (6 - remainingBalls))} balls",
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ],
 
             thisOverWidget(thisOverRuns),
             ScoreSummaryCard(batsmen: batsmen, bowlers: bowlers),
 
-            // Primary Button Row
             Wrap(
               spacing: 10,
               runSpacing: 8,
