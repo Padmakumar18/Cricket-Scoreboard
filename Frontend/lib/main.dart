@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
             '/ScoreBoardpage': (context) => const ScoreBoardPage(
               battingTeam: "",
               bowlingTeam: "",
-              totalOvers: 5,
+              totalOvers: 1,
               playersCount: 6,
             ),
           },

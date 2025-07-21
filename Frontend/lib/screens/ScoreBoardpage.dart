@@ -8,15 +8,12 @@ class ScoreBoardPage extends StatefulWidget {
   final int totalOvers;
   final int playersCount;
 
-  final bool isFirstInnings;
-
   const ScoreBoardPage({
     super.key,
     required this.battingTeam,
     required this.bowlingTeam,
     required this.totalOvers,
     required this.playersCount,
-    this.isFirstInnings = true,
   });
 
   @override
@@ -25,6 +22,8 @@ class ScoreBoardPage extends StatefulWidget {
 
 class _ScoreBoardPageState extends State<ScoreBoardPage> {
   late String title;
+
+  bool isFirstInnings = true;
 
   int over = 0;
   int remainingBalls = 6;
@@ -76,7 +75,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   void initState() {
     super.initState();
     title = '${widget.battingTeam} vs ${widget.bowlingTeam}';
+    showPlayerEntryDialog();
+  }
 
+  void showPlayerEntryDialog() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(
         context: context,
@@ -152,8 +154,21 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
     currentRunRate = run / ((over * 6) + (6 - remainingBalls));
     remainingBalls -= 1;
+    print("run");
+    print(run);
+    over = remainingBalls == 0 ? over + 1 : over;
+    print("isFirstInnings");
+    print(isFirstInnings);
+    if (over == widget.totalOvers && remainingBalls == 0) {
+      isFirstInnings = false;
+      debugPrint("Over limit reached: $over");
+      target = run + 1;
+      resetScoreCard();
+      initState();
+      return;
+    }
     if (remainingBalls == 0) {
-      over += 1;
+      // over += 1;
       remainingBalls = 6;
       thisOverRunsCount = 0;
       thisOverRuns.clear();
@@ -169,6 +184,22 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         : strikerBatmansIndex == 0
         ? 1
         : 0;
+  }
+
+  void resetScoreCard() {
+    setState(() {
+      over = 0;
+      remainingBalls = 6;
+      thisOverRunsCount = 0;
+      run = 0;
+      wickets = 0;
+      currentRunRate = 0.0;
+      thisOverRuns.clear();
+      batsmen.clear();
+      bowlers.clear();
+      strikerBatmansIndex = 0;
+    });
+    showPlayerEntryDialog();
   }
 
   @override
@@ -200,9 +231,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                infoChip(
-                  "Target : ${widget.isFirstInnings ? "-" : target + 1}",
-                ),
+                infoChip("Target : ${isFirstInnings ? "-" : target}"),
                 const SizedBox(width: 10),
                 infoChip("CRR : ${currentRunRate.toStringAsFixed(2)}"),
                 // const SizedBox(width: 10), write this in future
@@ -211,7 +240,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 infoChip('Players count : ${widget.playersCount}'),
               ],
             ),
-            if (!widget.isFirstInnings && target > run) ...[
+            if (!isFirstInnings && target > run) ...[
               const SizedBox(height: 12),
               Text(
                 "${target - run} runs needed in ${(widget.totalOvers * 6) - ((over * 6) + (6 - remainingBalls))} balls",
