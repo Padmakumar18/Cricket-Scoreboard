@@ -30,7 +30,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   int remainingBalls = 6;
   int thisOverRunsCount = 0;
 
-  int runs = 0;
+  int run = 0;
   int wickets = 0;
 
   int target = 0;
@@ -132,6 +132,45 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     });
   }
 
+  void updateScoreCard(String strRun) {
+    thisOverRuns.add(strRun);
+    thisOverRunsCount += int.parse(strRun);
+    run += int.parse(strRun);
+    final currentBatsman = batsmen[strikerBatmansIndex];
+
+    /// If leg byes or byes are selected, we don't update batsman runs
+    currentBatsman.runs += int.parse(strRun);
+
+    currentBatsman.balls += 1;
+    currentBatsman.strikeRate = currentBatsman.balls > 0
+        ? (currentBatsman.runs / currentBatsman.balls) * 100
+        : 0.0;
+    if (run == '4') {
+      currentBatsman.fours += 1;
+    } else if (run == '6') {
+      currentBatsman.sixes += 1;
+    }
+    currentRunRate = run / ((over * 6) + (6 - remainingBalls));
+    remainingBalls -= 1;
+    if (remainingBalls == 0) {
+      over += 1;
+      remainingBalls = 6;
+      thisOverRunsCount = 0;
+      thisOverRuns.clear();
+      strikerBatmansIndex = int.parse(strRun) % 2 != 0
+          ? strikerBatmansIndex
+          : strikerBatmansIndex == 0
+          ? 1
+          : 0;
+      return;
+    }
+    strikerBatmansIndex = int.parse(strRun) % 2 == 0
+        ? strikerBatmansIndex
+        : strikerBatmansIndex == 0
+        ? 1
+        : 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,7 +187,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "$runs/$wickets",
+                  "$run/$wickets",
                   style: TextStyle(fontSize: 50, color: Colors.white),
                 ),
                 SizedBox(width: 20),
@@ -172,10 +211,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 infoChip('Players count : ${widget.playersCount}'),
               ],
             ),
-            if (!widget.isFirstInnings && target > runs) ...[
+            if (!widget.isFirstInnings && target > run) ...[
               const SizedBox(height: 12),
               Text(
-                "${target - runs} runs needed in ${(widget.totalOvers * 6) - ((over * 6) + (6 - remainingBalls))} balls",
+                "${target - run} runs needed in ${(widget.totalOvers * 6) - ((over * 6) + (6 - remainingBalls))} balls",
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ],
@@ -285,36 +324,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                             debugPrint("Run selected: $run");
 
                             setState(() {
-                              thisOverRuns.add(run);
-                              thisOverRunsCount += int.parse(run);
-                              runs += int.parse(run);
-                              final currentBatsman =
-                                  batsmen[strikerBatmansIndex];
-                              currentBatsman.runs += int.parse(run);
-                              currentBatsman.balls += 1;
-                              currentBatsman.strikeRate =
-                                  currentBatsman.balls > 0
-                                  ? (currentBatsman.runs /
-                                            currentBatsman.balls) *
-                                        100
-                                  : 0.0;
-                              if (run == '4') {
-                                currentBatsman.fours += 1;
-                              } else if (run == '6') {
-                                currentBatsman.sixes += 1;
-                              }
-                              currentRunRate =
-                                  runs / ((over * 6) + (6 - remainingBalls));
-                              remainingBalls -= 1;
-                              if (remainingBalls == 0) {
-                                over += 1;
-                                remainingBalls = 6;
-                                thisOverRunsCount = 0;
-                                thisOverRuns.clear();
-                                strikerBatmansIndex = strikerBatmansIndex == 0
-                                    ? 1
-                                    : 0;
-                              }
+                              updateScoreCard(run);
                             });
                             if (isWicketFallen) {
                               Future.delayed(
