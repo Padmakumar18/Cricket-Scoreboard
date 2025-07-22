@@ -165,7 +165,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     });
   }
 
-  void updateScoreCard(String strRun) {
+  void _updateScoreCard(String strRun) {
     thisOverRuns.add(strRun);
     thisOverRunsCount += int.parse(strRun);
     run += int.parse(strRun);
@@ -184,7 +184,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     } else if (strRun == '6') {
       currentBatsman.sixes++;
     }
-    currentRunRate = run / ((over * 6) + (6 - remainingBalls));
+    currentRunRate = run == 0 ? 0 : run / ((over * 6) + (6 - remainingBalls));
     remainingBalls--;
     over = remainingBalls == 0 ? over + 1 : over;
     if (over == widget.totalOvers && remainingBalls == 0) {
@@ -198,7 +198,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       }
       target = run + 1;
 
-      resetScoreCard();
+      _resetScoreCard();
 
       showPlayerEntryDialog();
 
@@ -222,7 +222,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         : 0;
   }
 
-  void resetScoreCard() {
+  void _addNewBatter(String batterName) {
+    batsmen[strikerBatmansIndex] = BatsmanStats(
+      name: batterName,
+      runs: 0,
+      balls: 0,
+      fours: 0,
+      sixes: 0,
+      strikeRate: 0.0,
+    );
+  }
+
+  void _resetScoreCard() {
     setState(() {
       over = 0;
       remainingBalls = 6;
@@ -300,7 +311,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                     builder: (_) => NewBatterDialog(
                       onSubmit: (batterName) {
                         debugPrint("New Batter after Retire: $batterName");
-                        // TODO: Update state with new batter
+                        _addNewBatter(batterName);
                       },
                     ),
                   );
@@ -388,7 +399,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                             debugPrint("Run selected: $run");
 
                             setState(() {
-                              updateScoreCard(run);
+                              _updateScoreCard(run);
                             });
                             if (isWicketFallen) {
                               Future.delayed(
