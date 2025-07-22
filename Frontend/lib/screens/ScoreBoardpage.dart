@@ -75,7 +75,38 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   void initState() {
     super.initState();
     title = '${widget.battingTeam} vs ${widget.bowlingTeam}';
-    showPlayerEntryDialog();
+
+    // showPlayerEntryDialog();
+
+    batsmen = [
+      BatsmanStats(
+        name: "striker",
+        runs: 0,
+        balls: 0,
+        fours: 0,
+        sixes: 0,
+        strikeRate: 0.0,
+      ),
+      BatsmanStats(
+        name: "nonStriker",
+        runs: 0,
+        balls: 0,
+        fours: 0,
+        sixes: 0,
+        strikeRate: 0.0,
+      ),
+    ];
+
+    bowlers = [
+      BowlerStats(
+        name: "bowler",
+        overs: 0,
+        maidens: 0,
+        runs: 0,
+        wickets: 0,
+        economy: 0.0,
+      ),
+    ];
   }
 
   void showPlayerEntryDialog() {
@@ -147,22 +178,33 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     currentBatsman.strikeRate = currentBatsman.balls > 0
         ? (currentBatsman.runs / currentBatsman.balls) * 100
         : 0.0;
-    if (run == '4') {
+
+    if (strRun == '4') {
       currentBatsman.fours += 1;
-    } else if (run == '6') {
-      currentBatsman.sixes += 1;
+    } else if (strRun == '6') {
+      currentBatsman.sixes++;
     }
     currentRunRate = run / ((over * 6) + (6 - remainingBalls));
-    remainingBalls -= 1;
+    remainingBalls--;
     over = remainingBalls == 0 ? over + 1 : over;
     if (over == widget.totalOvers && remainingBalls == 0) {
-      isFirstInnings = false;
+      isFirstInnings = !isFirstInnings;
+      if (isFirstInnings) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/GetMatchDetails',
+          (Route<dynamic> route) => false,
+        );
+        return;
+      }
       target = run + 1;
+
       resetScoreCard();
+
+      showPlayerEntryDialog();
+
       return;
     }
     if (remainingBalls == 0) {
-      // over += 1;
       remainingBalls = 6;
       thisOverRunsCount = 0;
       thisOverRuns.clear();
@@ -193,15 +235,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       bowlers.clear();
       strikerBatmansIndex = 0;
     });
-    print(isFirstInnings);
-    if (!isFirstInnings) {
-      showPlayerEntryDialog();
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        '/GetMatchDetails',
-        (Route<dynamic> route) => false,
-      );
-    }
   }
 
   @override
