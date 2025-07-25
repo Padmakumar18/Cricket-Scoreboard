@@ -53,7 +53,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     title = '${widget.battingTeam} vs ${widget.bowlingTeam}';
 
     // showPlayerEntryDialog(); // for get strikder and nn striker , bowler detais
-    bowlerIndex = 0;
+    tempFunction();
+  }
+
+  void tempFunction() {
     batsmen = [
       BatsmanStats(
         name: "striker",
@@ -84,6 +87,127 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         economy: 0.0,
       ),
     ];
+  }
+
+  void _updatedBatsmanStats(int run) {
+    final currentBatsman = batsmen[strikerBatmansIndex];
+
+    /// If leg byes or byes are selected, we don't update batsman runs
+    currentBatsman.runs += run;
+
+    currentBatsman.balls += 1;
+    currentBatsman.strikeRate = currentBatsman.balls > 0
+        ? (currentBatsman.runs / currentBatsman.balls) * 100
+        : 0.0;
+
+    if (run == 4) {
+      currentBatsman.fours += 1;
+    } else if (run == 6) {
+      currentBatsman.sixes++;
+    }
+  }
+
+  bool _isMatchFinishOrNot() {
+    if ((matchOvers == widget.totalOvers && remainingBalls == 0) &&
+        (target != 0 && target == totalRuns)) {
+      matchWinTeam = "Draw the match";
+      return true;
+    }
+
+    if (matchOvers == widget.totalOvers &&
+        remainingBalls == 0 &&
+        !isFirstInnings &&
+        target > totalRuns) {
+      matchWinTeam =
+          "${widget.battingTeam} won by ${target - totalRuns - 1} runs";
+      return true;
+    }
+
+    if (target != 0 && target <= totalRuns && !isFirstInnings) {
+      matchWinTeam =
+          '${widget.bowlingTeam} won by ${widget.playersCount - wickets} wickets';
+      return true;
+    }
+    return false;
+  }
+
+  void _updatedBowlerStats(int run) {
+    final currentBowler = bowlers[bowlerIndex];
+
+    currentBowler.runs += run;
+    currentBowler.totalBalls += 1;
+    currentBowler.economy = double.parse(
+      (currentBowler.runs / currentBowler.totalBalls).toStringAsFixed(2),
+    );
+
+    if (remainingBalls == 0 && thisOverRunsCount == 0) {
+      currentBowler.maidens += 1;
+    }
+
+    if (isWicketFallen) {
+      currentBowler.wickets += 1;
+    }
+  }
+
+  void _updateScoreCard(String strRun) {
+    thisOverRuns.add(strRun);
+    thisOverRunsCount += int.parse(strRun);
+    totalRuns += int.parse(strRun);
+
+    // update batmans stats
+    _updatedBatsmanStats(int.parse(strRun));
+
+    // updated bowler stats
+    _updatedBowlerStats(int.parse(strRun));
+
+    currentRunRate = totalRuns == 0
+        ? 0
+        : totalRuns / ((matchOvers * 6) + (6 - remainingBalls));
+    remainingBalls--;
+    matchOvers = remainingBalls == 0 ? matchOvers + 1 : matchOvers;
+
+    if ((matchOvers == widget.totalOvers && remainingBalls == 0) ||
+        (target != 0 && target <= totalRuns)) {
+      isFirstInnings = !isFirstInnings;
+
+      // if (_isMatchFinishOrNot()) {
+      //   showMatchWonDialog(context);
+      //   return;
+      // }
+
+      if (isFirstInnings) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/GetMatchDetails',
+          (Route<dynamic> route) => false,
+        );
+        return;
+      }
+
+      target = totalRuns + 1;
+
+      _resetScoreCard();
+      // showPlayerEntryDialog();
+      tempFunction();
+
+      return;
+    }
+
+    if (remainingBalls == 0) {
+      remainingBalls = 6;
+      thisOverRunsCount = 0;
+      thisOverRuns.clear();
+      strikerBatmansIndex = int.parse(strRun) % 2 != 0
+          ? strikerBatmansIndex
+          : strikerBatmansIndex == 0
+          ? 1
+          : 0;
+      return;
+    }
+    strikerBatmansIndex = int.parse(strRun) % 2 == 0
+        ? strikerBatmansIndex
+        : strikerBatmansIndex == 0
+        ? 1
+        : 0;
   }
 
   void showPlayerEntryDialog() {
@@ -142,113 +266,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         ),
       );
     });
-  }
-
-  void _updatedBatsmanStats(int run) {
-    final currentBatsman = batsmen[strikerBatmansIndex];
-
-    /// If leg byes or byes are selected, we don't update batsman runs
-    currentBatsman.runs += run;
-
-    currentBatsman.balls += 1;
-    currentBatsman.strikeRate = currentBatsman.balls > 0
-        ? (currentBatsman.runs / currentBatsman.balls) * 100
-        : 0.0;
-
-    if (run == 4) {
-      currentBatsman.fours += 1;
-    } else if (run == 6) {
-      currentBatsman.sixes++;
-    }
-  }
-
-  void _updatedBowlerStats(int run) {
-    final currentBowler = bowlers[bowlerIndex];
-
-    currentBowler.runs += run;
-    currentBowler.totalBalls += 1;
-    currentBowler.economy = double.parse(
-      (currentBowler.runs / currentBowler.totalBalls).toStringAsFixed(2),
-    );
-
-    if (remainingBalls == 0 && thisOverRunsCount == 0) {
-      currentBowler.maidens += 1;
-    }
-
-    if (isWicketFallen) {
-      currentBowler.wickets += 1;
-    }
-  }
-
-  void _updateScoreCard(String strRun) {
-    thisOverRuns.add(strRun);
-    thisOverRunsCount += int.parse(strRun);
-    totalRuns += int.parse(strRun);
-
-    // update batmans stats
-    _updatedBatsmanStats(int.parse(strRun));
-
-    // updated bowler stats
-    _updatedBowlerStats(int.parse(strRun));
-
-    currentRunRate = totalRuns == 0
-        ? 0
-        : totalRuns / ((matchOvers * 6) + (6 - remainingBalls));
-    remainingBalls--;
-    matchOvers = remainingBalls == 0 ? matchOvers + 1 : matchOvers;
-
-    if ((matchOvers == widget.totalOvers && remainingBalls == 0) &&
-        (target != 0 && target == totalRuns)) {
-      matchWinTeam = "Draw the match";
-      showMatchWonDialog(context);
-      return;
-    }
-
-    if ((matchOvers == widget.totalOvers && remainingBalls == 0) ||
-        (target != 0 && target <= totalRuns)) {
-      isFirstInnings = !isFirstInnings;
-
-      if (target != 0 && target <= totalRuns && !isFirstInnings) {
-        matchWinTeam =
-            '${widget.bowlingTeam} won by ${widget.playersCount - wickets} wickets';
-        showMatchWonDialog(context);
-        return;
-      }
-
-      if (matchOvers == widget.totalOvers &&
-          remainingBalls == 0 &&
-          !isFirstInnings &&
-          target > totalRuns) {
-        matchWinTeam =
-            "${widget.battingTeam} won by ${target - totalRuns - 1} runs";
-        showMatchWonDialog(context);
-        return;
-      }
-
-      target = totalRuns + 1;
-
-      _resetScoreCard();
-      showPlayerEntryDialog();
-
-      return;
-    }
-
-    if (remainingBalls == 0) {
-      remainingBalls = 6;
-      thisOverRunsCount = 0;
-      thisOverRuns.clear();
-      strikerBatmansIndex = int.parse(strRun) % 2 != 0
-          ? strikerBatmansIndex
-          : strikerBatmansIndex == 0
-          ? 1
-          : 0;
-      return;
-    }
-    strikerBatmansIndex = int.parse(strRun) % 2 == 0
-        ? strikerBatmansIndex
-        : strikerBatmansIndex == 0
-        ? 1
-        : 0;
   }
 
   void showMatchWonDialog(BuildContext context) {
@@ -385,11 +402,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                     ),
                   );
                 }),
+
                 customButton("Swap striker", () {
                   setState(() {
                     strikerBatmansIndex = strikerBatmansIndex == 0 ? 1 : 0;
                   });
                 }),
+
                 customButton("End over", () {
                   showDialog(
                     context: context,
@@ -400,7 +419,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                       },
                     ),
                   );
-                }),
+                }, isEnabled: remainingBalls == 0),
+
                 customButton(
                   "Undo",
                   () {
@@ -596,13 +616,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     VoidCallback onPressed, {
     Color color = Colors.white,
     Color textColor = Colors.black,
+    bool isEnabled = true,
   }) {
     return SizedBox(
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isEnabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
-          // minimumSize: const Size(70, 40),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           textStyle: const TextStyle(fontSize: 15),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -712,12 +732,45 @@ class EventRadioButtonGroup extends StatefulWidget {
 class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
   String? selectedExtras;
   String? selectedWicket;
+
   final List<String> extras = ['Wide', 'No ball', 'Byes', 'Leg byes'];
+  final List<String> primaryExtras = ['Wide', 'No ball'];
+  final List<String> secondaryExtras = ['Byes', 'Leg byes'];
   final List<String> wicketEvents = ['Wicket', 'Run out'];
+
+  Set<String> selectedExtraSet = {};
+
+  void _handleExtraSelection(String event) {
+    setState(() {
+      if (event == 'No ball' || event == 'Wide') {
+        // Toggle selection
+        if (selectedExtraSet.contains(event)) {
+          selectedExtraSet.remove(event);
+        } else {
+          selectedExtraSet.add(event);
+        }
+      } else if (event == 'Byes' || event == 'Leg byes') {
+        // Only one of these two at a time
+        if (selectedExtraSet.contains(event)) {
+          selectedExtraSet.remove(event);
+        } else {
+          selectedExtraSet.removeAll({'Byes', 'Leg byes'});
+          selectedExtraSet.add(event);
+        }
+      }
+
+      selectedExtras = selectedExtraSet.isNotEmpty
+          ? selectedExtraSet.join(', ')
+          : null;
+
+      widget.onChanged(selectedExtras, selectedWicket);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Align(
           alignment: Alignment.center,
@@ -725,21 +778,39 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
             spacing: 10,
             runSpacing: 8,
             children: extras.map((event) {
+              bool isSelected = selectedExtraSet.contains(event);
+              bool isDisabled = false;
+
+              if (event == 'Wide') {
+                isDisabled =
+                    selectedExtraSet.contains('Byes') ||
+                    selectedExtraSet.contains('Leg byes');
+              } else if (event == 'Byes' || event == 'Leg byes') {
+                isDisabled =
+                    selectedExtraSet.contains('Wide') ||
+                    selectedExtraSet.contains(
+                      event == 'Byes' ? 'Leg byes' : 'Byes',
+                    );
+              }
+
               return ChoiceChip(
-                label: Text(event),
-                selected: selectedExtras == event,
-                onSelected: (_) {
-                  setState(() {
-                    selectedExtras = selectedExtras == event ? null : event;
-                    widget.onChanged(selectedExtras, selectedWicket);
-                  });
-                },
-                selectedColor: Colors.green,
-                labelStyle: TextStyle(
-                  color: selectedExtras == event ? Colors.white : Colors.black,
-                  fontSize: 14,
+                label: Text(
+                  event,
+                  style: TextStyle(
+                    color: isDisabled
+                        ? Colors.black.withOpacity(0.4)
+                        : (isSelected ? Colors.white : Colors.black),
+                    fontSize: 14,
+                  ),
                 ),
-                backgroundColor: Colors.white,
+                selected: isSelected,
+                onSelected: isDisabled
+                    ? null
+                    : (_) => _handleExtraSelection(event),
+                selectedColor: Colors.green,
+                backgroundColor: isDisabled
+                    ? Colors.grey.shade300
+                    : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                   side: const BorderSide(color: Colors.grey),
@@ -748,7 +819,9 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
             }).toList(),
           ),
         ),
-        // const SizedBox(height: 8),
+
+        const SizedBox(height: 8),
+
         Align(
           alignment: Alignment.center,
           child: Wrap(
