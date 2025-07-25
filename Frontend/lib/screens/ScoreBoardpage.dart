@@ -1,3 +1,4 @@
+import 'package:Frontend/screens/ViewScoreBoard.dart';
 import 'package:flutter/material.dart';
 import 'package:Frontend/widgets/ScoreSummaryCard.dart';
 import 'package:Frontend/widgets/OnFieldPlayersCard.dart';
@@ -193,8 +194,15 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     remainingBalls--;
     matchOvers = remainingBalls == 0 ? matchOvers + 1 : matchOvers;
 
-    if (matchOvers == widget.totalOvers && remainingBalls == 0) {
+    if ((matchOvers == widget.totalOvers && remainingBalls == 0) ||
+        (target != 0 && target <= totalRuns)) {
+      if (target != 0 && target <= totalRuns) {
+        showMatchWonDialog(context);
+        return;
+      }
+
       isFirstInnings = !isFirstInnings;
+
       if (isFirstInnings) {
         Navigator.of(context).pushNamedAndRemoveUntil(
           '/GetMatchDetails',
@@ -202,14 +210,15 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         );
         return;
       }
+
       target = totalRuns + 1;
 
       _resetScoreCard();
-
       showPlayerEntryDialog();
 
       return;
     }
+
     if (remainingBalls == 0) {
       remainingBalls = 6;
       thisOverRunsCount = 0;
@@ -226,6 +235,46 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         : strikerBatmansIndex == 0
         ? 1
         : 0;
+  }
+
+  void showMatchWonDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            '🎉 Match Won!',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text('Congratulations! Your team has won the match.'),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ViewScoreBoard(batsmen: batsmen, bowlers: bowlers),
+                  ),
+                );
+              },
+              child: Text('View Scorecard'),
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/GetMatchDetails',
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: Text('Start a New Match'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _addNewBatter(String batterName) {
@@ -719,60 +768,3 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
     );
   }
 }
-
-
-//// ---------------- This is for update batsman runs and balls -------------------
-
-// ElevatedButton(
-//               onPressed: () {
-//                 setState(() {
-//                   final current = batsmen[strikerBatmansIndex];
-
-//                   final updatedRuns = current.runs + 1;
-//                   final updatedBalls = current.balls + 1;
-//                   final updatedStrikeRate = updatedBalls > 0
-//                       ? (updatedRuns / updatedBalls) * 100
-//                       : 0.0;
-
-//                   batsmen[strikerBatmansIndex] = BatsmanStats(
-//                     name: current.name,
-//                     runs: updatedRuns,
-//                     balls: updatedBalls,
-//                     fours: current.fours,
-//                     sixes: current.sixes,
-//                     strikeRate: updatedStrikeRate,
-//                   );
-//                 });
-//               },
-
-//               child: const Text("Add run for batsman"),
-//             ),
-
-
-
-/// ------------------- This is for testing purposes only -------------------
-                    // showDialog(
-                    //   context: context,
-                    //   barrierDismissible: true, // allow tapping outside
-                    //   builder: (context) => MatchResultDialog(
-                    //     winningTeam: "Challengers",
-                    //     losingTeam: "Warriors",
-                    //     onStartNewMatch: () {
-                    //       Navigator.pushNamedAndRemoveUntil(
-                    //         context,
-                    //         '/start',
-                    //         (route) => false,
-                    //       );
-                    //     },
-                    //     onViewScorecard: () {
-                    //       Navigator.pushNamed(context, '/scorecard');
-                    //     },
-                    //   ),
-                    // ).then((_) {
-                    //   // If dialog is closed without using the buttons
-                    //   Navigator.pushNamedAndRemoveUntil(
-                    //     context,
-                    //     '/home',
-                    //     (route) => false,
-                    //   );
-                    // });

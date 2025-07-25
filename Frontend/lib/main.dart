@@ -1,3 +1,4 @@
+import 'package:Frontend/screens/ViewScoreBoard.dart';
 import 'package:flutter/material.dart';
 import 'package:Frontend/screens/LoginPage.dart';
 import 'package:Frontend/screens/SignupPage.dart';
