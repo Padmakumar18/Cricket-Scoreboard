@@ -21,63 +21,35 @@ class ScoreBoardPage extends StatefulWidget {
 }
 
 class _ScoreBoardPageState extends State<ScoreBoardPage> {
-  late String title;
+  late String title; // for title
 
   bool isFirstInnings = true;
 
-  int over = 0;
-  int remainingBalls = 6;
-  int thisOverRunsCount = 0;
+  int matchOvers = 0; // for count completed overs
+  int remainingBalls = 6; // over remaining balls
+  int thisOverRunsCount = 0; // currrent over run
 
-  int run = 0;
+  int totalRuns = 0;
   int wickets = 0;
 
   int target = 0;
   double currentRunRate = 0.0;
 
   int strikerBatmansIndex = 0;
+  int bowlerIndex = 0;
   bool isWicketFallen = false;
 
   List<String> thisOverRuns = [];
   List<BatsmanStats> batsmen = [];
   List<BowlerStats> bowlers = [];
-  // List<BatsmanStats> batsmen = [
-  //   BatsmanStats(
-  //     name: "Shikhar Dhawan*",
-  //     runs: 72,
-  //     balls: 39,
-  //     fours: 10,
-  //     sixes: 2,
-  //     strikeRate: 300.00,
-  //   ),
-  //   BatsmanStats(
-  //     name: "Virat Kohli",
-  //     runs: 26,
-  //     balls: 20,
-  //     fours: 2,
-  //     sixes: 1,
-  //     strikeRate: 100.00,
-  //   ),
-  // ];
-
-  // List<BowlerStats> bowlers = [
-  //   BowlerStats(
-  //     name: "Bhuvneshwar Kumar",
-  //     overs: 4,
-  //     maidens: 0,
-  //     runs: 24,
-  //     wickets: 5,
-  //     economy: 18.00,
-  //   ),
-  // ];
 
   @override
   void initState() {
     super.initState();
     title = '${widget.battingTeam} vs ${widget.bowlingTeam}';
 
-    // showPlayerEntryDialog();
-
+    // showPlayerEntryDialog(); // for get strikder and nn striker , bowler detais
+    bowlerIndex = 0;
     batsmen = [
       BatsmanStats(
         name: "striker",
@@ -103,6 +75,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         overs: 0,
         maidens: 0,
         runs: 0,
+        totalBalls: 0,
         wickets: 0,
         economy: 0.0,
       ),
@@ -150,11 +123,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                     name: bowler,
                     overs: 0,
                     maidens: 0,
+                    totalBalls: 0,
                     runs: 0,
                     wickets: 0,
                     economy: 0.0,
                   ),
                 ];
+                bowlerIndex = 0;
               } else {
                 bowlers[0].name = bowler;
               }
@@ -165,29 +140,60 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     });
   }
 
-  void _updateScoreCard(String strRun) {
-    thisOverRuns.add(strRun);
-    thisOverRunsCount += int.parse(strRun);
-    run += int.parse(strRun);
+  void _updatedBatsmanStats(int run) {
     final currentBatsman = batsmen[strikerBatmansIndex];
 
     /// If leg byes or byes are selected, we don't update batsman runs
-    currentBatsman.runs += int.parse(strRun);
+    currentBatsman.runs += run;
 
     currentBatsman.balls += 1;
     currentBatsman.strikeRate = currentBatsman.balls > 0
         ? (currentBatsman.runs / currentBatsman.balls) * 100
         : 0.0;
 
-    if (strRun == '4') {
+    if (run == 4) {
       currentBatsman.fours += 1;
-    } else if (strRun == '6') {
+    } else if (run == 6) {
       currentBatsman.sixes++;
     }
-    currentRunRate = run == 0 ? 0 : run / ((over * 6) + (6 - remainingBalls));
+  }
+
+  void _updatedBowlerStats(int run) {
+    final currentBowler = bowlers[bowlerIndex];
+
+    currentBowler.runs += run;
+    currentBowler.totalBalls += 1;
+    currentBowler.economy = double.parse(
+      (currentBowler.runs / currentBowler.totalBalls).toStringAsFixed(2),
+    );
+
+    if (remainingBalls == 0 && thisOverRunsCount == 0) {
+      currentBowler.maidens += 1;
+    }
+
+    if (isWicketFallen) {
+      currentBowler.wickets += 1;
+    }
+  }
+
+  void _updateScoreCard(String strRun) {
+    thisOverRuns.add(strRun);
+    thisOverRunsCount += int.parse(strRun);
+    totalRuns += int.parse(strRun);
+
+    // update batmans stats
+    _updatedBatsmanStats(int.parse(strRun));
+
+    // updated bowler stats
+    _updatedBowlerStats(int.parse(strRun));
+
+    currentRunRate = totalRuns == 0
+        ? 0
+        : totalRuns / ((matchOvers * 6) + (6 - remainingBalls));
     remainingBalls--;
-    over = remainingBalls == 0 ? over + 1 : over;
-    if (over == widget.totalOvers && remainingBalls == 0) {
+    matchOvers = remainingBalls == 0 ? matchOvers + 1 : matchOvers;
+
+    if (matchOvers == widget.totalOvers && remainingBalls == 0) {
       isFirstInnings = !isFirstInnings;
       if (isFirstInnings) {
         Navigator.of(context).pushNamedAndRemoveUntil(
@@ -196,7 +202,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         );
         return;
       }
-      target = run + 1;
+      target = totalRuns + 1;
 
       _resetScoreCard();
 
@@ -235,10 +241,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
   void _resetScoreCard() {
     setState(() {
-      over = 0;
+      matchOvers = 0;
       remainingBalls = 6;
       thisOverRunsCount = 0;
-      run = 0;
+      totalRuns = 0;
       wickets = 0;
       currentRunRate = 0.0;
       thisOverRuns.clear();
@@ -264,12 +270,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "$run/$wickets",
+                  "$totalRuns/$wickets",
                   style: TextStyle(fontSize: 50, color: Colors.white),
                 ),
                 SizedBox(width: 20),
                 Text(
-                  '$over.${6 - remainingBalls} / ${widget.totalOvers} Ov',
+                  '$matchOvers.${6 - remainingBalls} / ${widget.totalOvers} Ov',
                   style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
               ],
@@ -286,10 +292,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 infoChip('Players count : ${widget.playersCount}'),
               ],
             ),
-            if (!isFirstInnings && target > run) ...[
+            if (!isFirstInnings && target > totalRuns) ...[
               const SizedBox(height: 12),
               Text(
-                "${target - run} runs needed in ${(widget.totalOvers * 6) - ((over * 6) + (6 - remainingBalls))} balls",
+                "${target - totalRuns} runs needed in ${(widget.totalOvers * 6) - ((matchOvers * 6) + (6 - remainingBalls))} balls",
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ],
@@ -346,16 +352,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.of(
-                                  context,
-                                ).pop(); // Close dialog without action
+                                Navigator.of(context).pop();
                               },
                               child: const Text("No"),
                             ),
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).pop(); // Close dialog
-                                // TODO: Implement your undo logic here
+                                Navigator.of(context).pop();
                                 debugPrint("Undo confirmed.");
                               },
                               child: const Text("Yes"),

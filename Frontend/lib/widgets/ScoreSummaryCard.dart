@@ -79,7 +79,12 @@ class ScoreSummaryCard extends StatelessWidget {
             return Row(
               children: [
                 Expanded(flex: 3, child: Text(bowler.name, style: statStyle)),
-                Expanded(child: Text("${bowler.overs}", style: statStyle)),
+                Expanded(
+                  child: Text(
+                    "${bowler.overs}.${(bowler.totalBalls - (bowler.overs * 6)).abs()}",
+                    style: statStyle,
+                  ),
+                ),
                 Expanded(child: Text("${bowler.maidens}", style: statStyle)),
                 Expanded(child: Text("${bowler.runs}", style: statStyle)),
                 Expanded(child: Text("${bowler.wickets}", style: statStyle)),
@@ -128,6 +133,7 @@ class BatsmanStats {
 class BowlerStats {
   late String name;
   int overs;
+  int totalBalls;
   int maidens;
   int runs;
   int wickets;
@@ -136,6 +142,7 @@ class BowlerStats {
   BowlerStats({
     required this.name,
     required this.overs,
+    required this.totalBalls,
     required this.maidens,
     required this.runs,
     required this.wickets,
