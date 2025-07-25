@@ -54,62 +54,83 @@ class ViewScoreBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Scorecard'), centerTitle: true),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Batsmen",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6),
-              const Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      "Name",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/GetMatchDetails',
+          (Route<dynamic> route) => false,
+        );
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Scorecard'),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                '/GetMatchDetails',
+                (Route<dynamic> route) => false,
+              );
+            },
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Batsmen",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                const Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        "Name",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                  Expanded(child: Text("R")),
-                  Expanded(child: Text("B")),
-                  Expanded(child: Text("4s")),
-                  Expanded(child: Text("6s")),
-                  Expanded(child: Text("SR")),
-                ],
-              ),
-              const Divider(),
-              ...batsmen.map(_buildBatsmanRow).toList(),
-              const SizedBox(height: 24),
-              const Text(
-                "Bowlers",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6),
-              const Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      "Name",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Expanded(child: Text("R")),
+                    Expanded(child: Text("B")),
+                    Expanded(child: Text("4s")),
+                    Expanded(child: Text("6s")),
+                    Expanded(child: Text("SR")),
+                  ],
+                ),
+                const Divider(),
+                ...batsmen.map(_buildBatsmanRow).toList(),
+                const SizedBox(height: 24),
+                const Text(
+                  "Bowlers",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                const Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        "Name",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                  Expanded(child: Text("Ov")),
-                  Expanded(child: Text("M")),
-                  Expanded(child: Text("R")),
-                  Expanded(child: Text("W")),
-                  Expanded(child: Text("Econ")),
-                ],
-              ),
-              const Divider(),
-              ...bowlers.map(_buildBowlerRow).toList(),
-            ],
+                    Expanded(child: Text("Ov")),
+                    Expanded(child: Text("M")),
+                    Expanded(child: Text("R")),
+                    Expanded(child: Text("W")),
+                    Expanded(child: Text("Eco")),
+                  ],
+                ),
+                const Divider(),
+                ...bowlers.map(_buildBowlerRow).toList(),
+              ],
+            ),
           ),
         ),
       ),
