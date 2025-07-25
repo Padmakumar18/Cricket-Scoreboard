@@ -30,6 +30,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   int remainingBalls = 6; // over remaining balls
   int thisOverRunsCount = 0; // currrent over run
 
+  bool noBall = false;
+  String matchWinTeam = "";
+
   int totalRuns = 0;
   int wickets = 0;
 
@@ -194,20 +197,31 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     remainingBalls--;
     matchOvers = remainingBalls == 0 ? matchOvers + 1 : matchOvers;
 
+    if ((matchOvers == widget.totalOvers && remainingBalls == 0) &&
+        (target != 0 && target == totalRuns)) {
+      matchWinTeam = "Draw the match";
+      showMatchWonDialog(context);
+      return;
+    }
+
     if ((matchOvers == widget.totalOvers && remainingBalls == 0) ||
         (target != 0 && target <= totalRuns)) {
-      if (target != 0 && target <= totalRuns) {
+      isFirstInnings = !isFirstInnings;
+
+      if (target != 0 && target <= totalRuns && !isFirstInnings) {
+        matchWinTeam =
+            '${widget.bowlingTeam} won by ${widget.playersCount - wickets} wickets';
         showMatchWonDialog(context);
         return;
       }
 
-      isFirstInnings = !isFirstInnings;
-
-      if (isFirstInnings) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          '/GetMatchDetails',
-          (Route<dynamic> route) => false,
-        );
+      if (matchOvers == widget.totalOvers &&
+          remainingBalls == 0 &&
+          !isFirstInnings &&
+          target > totalRuns) {
+        matchWinTeam =
+            "${widget.battingTeam} won by ${target - totalRuns - 1} runs";
+        showMatchWonDialog(context);
         return;
       }
 
@@ -247,7 +261,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             '🎉 Match Won!',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          content: Text('Congratulations! Your team has won the match.'),
+          content: Text(matchWinTeam),
           actions: [
             ElevatedButton(
               onPressed: () {
