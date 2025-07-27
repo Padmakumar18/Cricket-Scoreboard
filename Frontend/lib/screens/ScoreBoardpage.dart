@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'package:Frontend/screens/ViewScoreBoard.dart';
 import 'package:flutter/material.dart';
 import 'package:Frontend/widgets/ScoreSummaryCard.dart';
@@ -43,14 +44,24 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   int bowlerIndex = 0;
   bool isWicketFallen = false;
 
+  String? extrasType = "";
+  String? wicketType = "";
+
   List<String> thisOverRuns = [];
   List<BatsmanStats> batsmen = [];
   List<BowlerStats> bowlers = [];
+
+  HashMap<String, String> extrasTypesCharacter = HashMap();
 
   @override
   void initState() {
     super.initState();
     title = '${widget.battingTeam} vs ${widget.bowlingTeam}';
+
+    extrasTypesCharacter["No Ball"] = "nb";
+    extrasTypesCharacter["Wide"] = "wd";
+    extrasTypesCharacter["Byes"] = "b";
+    extrasTypesCharacter["Leg byes"] = "lb";
 
     // showPlayerEntryDialog(); // for get strikder and nn striker , bowler detais
     tempFunction();
@@ -463,6 +474,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 debugPrint(
                   "Extras: $selectedExtras, Wicket Event: $selectedWicket",
                 );
+                extrasType = selectedExtras;
+                wicketType = selectedWicket;
+
+                // print(extrasType);
+                // print(wicketType);
+
                 setState(() {
                   isWicketFallen =
                       selectedWicket == "Wicket" || selectedWicket == "Run Out";
