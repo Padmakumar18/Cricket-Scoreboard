@@ -161,10 +161,20 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   }
 
   void _updateScoreCard(String strRun) {
-    if (extrasType == null || extrasType == "") {
-      String temp = strRun + "";
+    print("-------------------------");
+    print(strRun);
+    print(extrasType);
+    print(wicketType);
+    print(noBall);
+    print("-------------------------");
+
+    String finalValidationRun = strRun;
+
+    if(extrasType != "" || wicketType != "") {
+      
     }
-    thisOverRuns.add(strRun);
+
+    thisOverRuns.add(finalValidationRun);
     thisOverRunsCount += int.parse(strRun);
     totalRuns += int.parse(strRun);
 
