@@ -5,8 +5,11 @@ import 'package:Frontend/screens/SignupPage.dart';
 import 'package:Frontend/screens/GetMatchDetails.dart';
 import 'package:Frontend/screens/ScoreBoardpage.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 Future<void> main() async {
+  await dotenv.load(fileName: ".env.dev");
   runApp(const MyApp());
 }
 
