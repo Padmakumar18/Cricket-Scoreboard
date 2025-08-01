@@ -58,7 +58,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     super.initState();
     title = '${widget.battingTeam} vs ${widget.bowlingTeam}';
 
-    extrasTypesCharacter["No Ball"] = "nb";
+    extrasTypesCharacter["No ball"] = "nb";
     extrasTypesCharacter["Wide"] = "wd";
     extrasTypesCharacter["Byes"] = "b";
     extrasTypesCharacter["Leg byes"] = "lb";
@@ -161,6 +161,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   }
 
   void _updateScoreCard(String strRun) {
+    print(strRun.runtimeType);
     print("-------------------------");
     print(strRun);
     print(extrasType);
@@ -169,9 +170,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     print("-------------------------");
 
     String finalValidationRun = strRun;
+    print(extrasType);
 
-    if(extrasType != "" || wicketType != "") {
-      
+    if (extrasType != "" || wicketType != "") {
+      if (extrasTypesCharacter.containsKey(extrasType) && extrasType != "") {
+        print(extrasTypesCharacter.containsKey(extrasType));
+        finalValidationRun =
+            finalValidationRun + extrasTypesCharacter[extrasType]!;
+      }
     }
 
     thisOverRuns.add(finalValidationRun);
@@ -693,7 +699,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 if (run == "4" || run == "6") {
                   bgColor = Colors.green;
                 } else if (isNumeric && run != "0") {
-                  bgColor = const Color.fromARGB(255, 255, 166, 0);
+                  bgColor = const Color.fromARGB(255, 255, 255, 255);
                 }
 
                 bool isDotBall = run == "0";
