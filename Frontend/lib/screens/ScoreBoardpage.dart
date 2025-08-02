@@ -53,6 +53,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
   HashMap<String, String> extrasTypesCharacter = HashMap();
 
+  late EventRadioButtonGroupController _eventController;
+
   @override
   void initState() {
     super.initState();
@@ -62,6 +64,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     extrasTypesCharacter["Wide"] = "wd";
     extrasTypesCharacter["Byes"] = "b";
     extrasTypesCharacter["Leg byes"] = "lb";
+    _eventController = EventRadioButtonGroupController();
 
     // showPlayerEntryDialog(); // for get strikder and nn striker , bowler detais
     tempFunction();
@@ -173,11 +176,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     print(extrasType);
 
     if (extrasType != "" || wicketType != "") {
-      if (extrasTypesCharacter.containsKey(extrasType) && extrasType != "") {
-        print(extrasTypesCharacter.containsKey(extrasType));
-        finalValidationRun =
-            finalValidationRun + extrasTypesCharacter[extrasType]!;
-      }
+      // final EventRadioButtonGroupController controller =
+      //     EventRadioButtonGroupController();
+      if (extrasType != "" && extrasType != null) {
+        List<String> parts = extrasType!
+            .split(',')
+            .map((e) => e.trim())
+            .toList();
+        parts.forEach((e) {
+          finalValidationRun += extrasTypesCharacter[e]!;
+        });
+        _eventController.clearValues();
+      } else {}
     }
 
     thisOverRuns.add(finalValidationRun);
@@ -489,6 +499,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
             // const SizedBox(height: 16),
             EventRadioButtonGroup(
+              controller: _eventController,
               onChanged: (selectedExtras, selectedWicket) {
                 debugPrint(
                   "Extras: $selectedExtras, Wicket Event: $selectedWicket",
@@ -496,15 +507,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 extrasType = selectedExtras;
                 wicketType = selectedWicket;
 
-                // print(extrasType);
-                // print(wicketType);
-
                 setState(() {
                   isWicketFallen =
                       selectedWicket == "Wicket" || selectedWicket == "Run Out";
                 });
               },
             ),
+
             const Divider(color: Colors.white70),
 
             Column(
@@ -756,10 +765,27 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   }
 }
 
+class EventRadioButtonGroupController {
+  void Function()? _clearCallback;
+
+  void _register(void Function() callback) {
+    _clearCallback = callback;
+  }
+
+  void clearValues() {
+    _clearCallback?.call();
+  }
+}
+
 class EventRadioButtonGroup extends StatefulWidget {
   final void Function(String?, String?) onChanged;
+  final EventRadioButtonGroupController controller;
 
-  const EventRadioButtonGroup({super.key, required this.onChanged});
+  const EventRadioButtonGroup({
+    super.key,
+    required this.onChanged,
+    required this.controller,
+  });
 
   @override
   State<EventRadioButtonGroup> createState() => _EventRadioButtonGroupState();
@@ -770,23 +796,34 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
   String? selectedWicket;
 
   final List<String> extras = ['Wide', 'No ball', 'Byes', 'Leg byes'];
-  final List<String> primaryExtras = ['Wide', 'No ball'];
-  final List<String> secondaryExtras = ['Byes', 'Leg byes'];
   final List<String> wicketEvents = ['Wicket', 'Run out'];
 
   Set<String> selectedExtraSet = {};
 
+  @override
+  void initState() {
+    super.initState();
+    widget.controller._register(_clearValues);
+  }
+
+  void _clearValues() {
+    setState(() {
+      selectedExtras = null;
+      selectedWicket = null;
+      selectedExtraSet.clear();
+      widget.onChanged(null, null);
+    });
+  }
+
   void _handleExtraSelection(String event) {
     setState(() {
       if (event == 'No ball' || event == 'Wide') {
-        // Toggle selection
         if (selectedExtraSet.contains(event)) {
           selectedExtraSet.remove(event);
         } else {
           selectedExtraSet.add(event);
         }
       } else if (event == 'Byes' || event == 'Leg byes') {
-        // Only one of these two at a time
         if (selectedExtraSet.contains(event)) {
           selectedExtraSet.remove(event);
         } else {
@@ -808,84 +845,74 @@ class _EventRadioButtonGroupState extends State<EventRadioButtonGroup> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Align(
-          alignment: Alignment.center,
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 8,
-            children: extras.map((event) {
-              bool isSelected = selectedExtraSet.contains(event);
-              bool isDisabled = false;
+        Wrap(
+          spacing: 10,
+          runSpacing: 8,
+          children: extras.map((event) {
+            bool isSelected = selectedExtraSet.contains(event);
+            bool isDisabled = false;
 
-              if (event == 'Wide') {
-                isDisabled =
-                    selectedExtraSet.contains('Byes') ||
-                    selectedExtraSet.contains('Leg byes');
-              } else if (event == 'Byes' || event == 'Leg byes') {
-                isDisabled =
-                    selectedExtraSet.contains('Wide') ||
-                    selectedExtraSet.contains(
-                      event == 'Byes' ? 'Leg byes' : 'Byes',
-                    );
-              }
+            if (event == 'Wide') {
+              isDisabled =
+                  selectedExtraSet.contains('Byes') ||
+                  selectedExtraSet.contains('Leg byes');
+            } else if (event == 'Byes' || event == 'Leg byes') {
+              isDisabled =
+                  selectedExtraSet.contains('Wide') ||
+                  selectedExtraSet.contains(
+                    event == 'Byes' ? 'Leg byes' : 'Byes',
+                  );
+            }
 
-              return ChoiceChip(
-                label: Text(
-                  event,
-                  style: TextStyle(
-                    color: isDisabled
-                        ? Colors.black.withOpacity(0.4)
-                        : (isSelected ? Colors.white : Colors.black),
-                    fontSize: 14,
-                  ),
+            return ChoiceChip(
+              label: Text(
+                event,
+                style: TextStyle(
+                  color: isDisabled
+                      ? Colors.black.withOpacity(0.4)
+                      : (isSelected ? Colors.white : Colors.black),
+                  fontSize: 14,
                 ),
-                selected: isSelected,
-                onSelected: isDisabled
-                    ? null
-                    : (_) => _handleExtraSelection(event),
-                selectedColor: Colors.green,
-                backgroundColor: isDisabled
-                    ? Colors.grey.shade300
-                    : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                  side: const BorderSide(color: Colors.grey),
-                ),
-              );
-            }).toList(),
-          ),
+              ),
+              selected: isSelected,
+              onSelected: isDisabled
+                  ? null
+                  : (_) => _handleExtraSelection(event),
+              selectedColor: Colors.green,
+              backgroundColor: isDisabled ? Colors.grey.shade300 : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: const BorderSide(color: Colors.grey),
+              ),
+            );
+          }).toList(),
         ),
-
         const SizedBox(height: 8),
-
-        Align(
-          alignment: Alignment.center,
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 8,
-            children: wicketEvents.map((event) {
-              return ChoiceChip(
-                label: Text(event),
-                selected: selectedWicket == event,
-                onSelected: (_) {
-                  setState(() {
-                    selectedWicket = selectedWicket == event ? null : event;
-                    widget.onChanged(selectedExtras, selectedWicket);
-                  });
-                },
-                selectedColor: Colors.red,
-                labelStyle: TextStyle(
-                  color: selectedWicket == event ? Colors.white : Colors.black,
-                  fontSize: 15,
-                ),
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                  side: const BorderSide(color: Colors.grey),
-                ),
-              );
-            }).toList(),
-          ),
+        Wrap(
+          spacing: 10,
+          runSpacing: 8,
+          children: wicketEvents.map((event) {
+            return ChoiceChip(
+              label: Text(event),
+              selected: selectedWicket == event,
+              onSelected: (_) {
+                setState(() {
+                  selectedWicket = selectedWicket == event ? null : event;
+                  widget.onChanged(selectedExtras, selectedWicket);
+                });
+              },
+              selectedColor: Colors.red,
+              labelStyle: TextStyle(
+                color: selectedWicket == event ? Colors.white : Colors.black,
+                fontSize: 15,
+              ),
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: const BorderSide(color: Colors.grey),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
