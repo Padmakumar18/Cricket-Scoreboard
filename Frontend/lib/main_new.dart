@@ -4,7 +4,7 @@ import 'providers/match_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'screens/match_setup_screen.dart';
-import 'screens/scoreboard_screen.dart';
+import 'screens/scoreboard_screen_simple.dart';
 import 'screens/ViewScoreBoard.dart';
 
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.dark);
