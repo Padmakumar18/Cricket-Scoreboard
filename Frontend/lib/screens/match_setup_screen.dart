@@ -513,6 +513,8 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
 
     setState(() => _isLoading = true);
 
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     try {
       final match = Match(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -535,17 +537,22 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
             : _tossWinner!,
       );
 
-      context.read<MatchProvider>().initializeMatch(match);
+      if (!mounted) return;
+
+      final matchProvider = context.read<MatchProvider>();
+      final navigator = Navigator.of(context);
+
+      matchProvider.initializeMatch(match);
 
       // Small delay for better UX
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/scoreboard');
+        navigator.pushReplacementNamed('/scoreboard');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text('Error starting match: $e'),
             backgroundColor: AppTheme.errorColor,

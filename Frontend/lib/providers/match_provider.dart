@@ -9,7 +9,7 @@ class MatchProvider extends ChangeNotifier {
   int _strikerIndex = 0;
   int _nonStrikerIndex = 1;
   int _currentBowlerIndex = 0;
-  List<Ball> _currentOverBalls = [];
+  final List<Ball> _currentOverBalls = [];
 
   // Getters
   Match? get currentMatch => _currentMatch;

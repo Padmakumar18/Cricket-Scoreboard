@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/match_provider.dart';
 import '../widgets/responsive_layout.dart';
 import '../core/theme/app_theme.dart';
@@ -16,7 +15,6 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Load match data when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MatchProvider>().loadMatchData();
     });
@@ -46,10 +44,7 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'new_match',
-                child: Text('New Match'),
-              ),
+              const PopupMenuItem(value: 'new_match', child: Text('New Match')),
               const PopupMenuItem(
                 value: 'view_scorecard',
                 child: Text('View Scorecard'),
@@ -90,23 +85,19 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
       ),
     );
   }
- 
- Widget _buildMobileLayout(MatchProvider matchProvider) {
+
+  Widget _buildMobileLayout(MatchProvider matchProvider) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _buildScoreHeader(matchProvider),
+          _buildScoreCard(matchProvider),
           const SizedBox(height: 16),
           _buildCurrentBatsmen(matchProvider),
           const SizedBox(height: 16),
           _buildCurrentBowler(matchProvider),
           const SizedBox(height: 16),
-          _buildCurrentOver(matchProvider),
-          const SizedBox(height: 16),
           _buildScoringButtons(matchProvider),
-          const SizedBox(height: 16),
-          _buildExtrasButtons(matchProvider),
         ],
       ),
     );
@@ -122,77 +113,29 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _buildScoreHeader(matchProvider),
+                  _buildScoreCard(matchProvider),
                   const SizedBox(height: 16),
                   _buildCurrentBatsmen(matchProvider),
                   const SizedBox(height: 16),
                   _buildCurrentBowler(matchProvider),
-                  const SizedBox(height: 16),
-                  _buildCurrentOver(matchProvider),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 16),
-          Expanded(
-            flex: 1,
-            child: Column(
-              children: [
-                _buildScoringButtons(matchProvider),
-                const SizedBox(height: 16),
-                _buildExtrasButtons(matchProvider),
-              ],
-            ),
-          ),
+          Expanded(flex: 3, child: _buildScoringButtons(matchProvider)),
         ],
       ),
     );
   }
 
   Widget _buildDesktopLayout(MatchProvider matchProvider) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Column(
-              children: [
-                _buildScoreHeader(matchProvider),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(child: _buildCurrentBatsmen(matchProvider)),
-                    const SizedBox(width: 16),
-                    Expanded(child: _buildCurrentBowler(matchProvider)),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                _buildCurrentOver(matchProvider),
-              ],
-            ),
-          ),
-          const SizedBox(width: 24),
-          Expanded(
-            flex: 2,
-            child: Column(
-              children: [
-                _buildScoringButtons(matchProvider),
-                const SizedBox(height: 16),
-                _buildExtrasButtons(matchProvider),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }  W
-idget _buildScoreHeader(MatchProvider matchProvider) {
-    final match = matchProvider.currentMatch!;
-    final innings = matchProvider.currentInnings;
+    return _buildTabletLayout(matchProvider);
+  }
 
+  Widget _buildScoreCard(MatchProvider matchProvider) {
+    final match = matchProvider.currentMatch!;
     return Card(
-      elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -203,82 +146,38 @@ idget _buildScoreHeader(MatchProvider matchProvider) {
             ),
             const SizedBox(height: 8),
             Text(
-              '${match.totalOvers} Overs Match',
-              style: TextStyle(color: Colors.grey[600]),
+              '${matchProvider.totalRuns}/${matchProvider.wickets}',
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.primaryColor,
+              ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Column(
-                  children: [
-                    Text(
-                      '${matchProvider.totalRuns}/${matchProvider.wickets}',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryColor,
-                      ),
-                    ),
-                    Text(
-                      '${matchProvider.overs}.${matchProvider.balls} overs',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text(
-                      'CRR: ${matchProvider.currentRunRate.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    if (!match.isFirstInnings) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        'Target: ${matchProvider.target}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      Text(
-                        'RRR: ${matchProvider.requiredRunRate.toStringAsFixed(2)}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
+            Text(
+              '${matchProvider.overs}.${matchProvider.balls}/${match.totalOvers} overs',
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
               '${match.battingTeam} batting',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
+            if (matchProvider.currentRunRate > 0)
+              Text(
+                'Run Rate: ${matchProvider.currentRunRate.toStringAsFixed(2)}',
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 300.ms).slideY(begin: -0.2, end: 0);
-  }  Wid
-get _buildCurrentBatsmen(MatchProvider matchProvider) {
-    final innings = matchProvider.currentInnings;
-    if (innings == null || innings.batsmen.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const Text('No batsmen on field'),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () => _showAddPlayersDialog(matchProvider),
-                child: const Text('Add Players'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    );
+  }
+
+  Widget _buildCurrentBatsmen(MatchProvider matchProvider) {
+    final batsmen = matchProvider.currentInnings?.batsmen ?? [];
+    if (batsmen.isEmpty) return const SizedBox.shrink();
 
     return Card(
-      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -289,64 +188,39 @@ get _buildCurrentBatsmen(MatchProvider matchProvider) {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            ...innings.batsmen.where((b) => !b.isOut).take(2).map((batsman) {
+            ...batsmen.where((b) => !b.isOut).take(2).map((batsman) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   children: [
                     if (batsman.isOnStrike)
-                      const Icon(Icons.sports_cricket, 
-                          color: AppTheme.primaryColor, size: 16),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        batsman.name,
-                        style: TextStyle(
-                          fontWeight: batsman.isOnStrike 
-                              ? FontWeight.bold 
-                              : FontWeight.normal,
-                        ),
+                      const Icon(
+                        Icons.sports_cricket,
+                        size: 16,
+                        color: AppTheme.accentColor,
                       ),
-                    ),
-                    Text('${batsman.runs}(${batsman.balls})'),
                     const SizedBox(width: 8),
+                    Expanded(child: Text(batsman.name)),
+                    Text('${batsman.runs}(${batsman.balls})'),
+                    const SizedBox(width: 16),
                     Text('SR: ${batsman.strikeRate.toStringAsFixed(1)}'),
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
-    ).animate().fadeIn(delay: 100.ms);
-  }  
-Widget _buildCurrentBowler(MatchProvider matchProvider) {
-    final innings = matchProvider.currentInnings;
-    if (innings == null || innings.bowlers.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const Text('No bowler selected'),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () => _showAddPlayersDialog(matchProvider),
-                child: const Text('Add Players'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final bowler = innings.bowlers.firstWhere(
-      (b) => b.isCurrentBowler,
-      orElse: () => innings.bowlers.first,
     );
+  }
+
+  Widget _buildCurrentBowler(MatchProvider matchProvider) {
+    final bowlers = matchProvider.currentInnings?.bowlers ?? [];
+    final currentBowler = bowlers.where((b) => b.isCurrentBowler).firstOrNull;
+
+    if (currentBowler == null) return const SizedBox.shrink();
 
     return Card(
-      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -359,127 +233,106 @@ Widget _buildCurrentBowler(MatchProvider matchProvider) {
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: Text(bowler.name)),
-                Text('${bowler.oversString} overs'),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Text('${bowler.runs}/${bowler.wickets}'),
-                const Spacer(),
-                Text('Econ: ${bowler.economy.toStringAsFixed(2)}'),
+                Expanded(child: Text(currentBowler.name)),
+                Text(
+                  '${currentBowler.overs}.${currentBowler.balls}-${currentBowler.maidens}-${currentBowler.runs}-${currentBowler.wickets}',
+                ),
+                const SizedBox(width: 16),
+                Text('Eco: ${currentBowler.economy.toStringAsFixed(2)}'),
               ],
             ),
           ],
         ),
       ),
-    ).animate().fadeIn(delay: 200.ms);
-  }  Wid
-get _buildCurrentOver(MatchProvider matchProvider) {
-    final overBalls = matchProvider.currentOverBalls;
+    );
+  }
 
+  Widget _buildScoringButtons(MatchProvider matchProvider) {
     return Card(
-      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Current Over',
+              'Scoring',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
-            if (overBalls.isEmpty)
-              const Text('No balls bowled in this over')
-            else
-              Wrap(
-                spacing: 8,
-                children: overBalls.map((ball) {
-                  return Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: ball.isWicket 
-                          ? Colors.red 
-                          : ball.isExtra 
-                              ? Colors.orange 
-                              : AppTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(16),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (int runs in [0, 1, 2, 3, 4, 6])
+                  ElevatedButton(
+                    onPressed: () => _recordRuns(matchProvider, runs),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: runs == 4 || runs == 6
+                          ? AppTheme.accentColor
+                          : AppTheme.primaryColor,
+                      minimumSize: const Size(60, 60),
                     ),
-                    child: Center(
-                      child: Text(
-                        ball.display,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    child: Text(
+                      runs.toString(),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(delay: 300.ms);
-  }  
-Widget _buildScoringButtons(MatchProvider matchProvider) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Runs',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+              ],
             ),
-            const SizedBox(height: 12),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 4,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              children: [0, 1, 2, 3, 4, 5, 6].map((runs) {
-                return ElevatedButton(
-                  onPressed: () => _recordRuns(matchProvider, runs),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ElevatedButton(
+                  onPressed: () => _recordExtra(matchProvider, 'wide'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: runs == 4 || runs == 6 
-                        ? AppTheme.accentColor 
-                        : null,
-                    padding: const EdgeInsets.all(8),
+                    backgroundColor: Colors.orange,
                   ),
-                  child: Text(
-                    runs.toString(),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: const Text('Wide'),
+                ),
+                ElevatedButton(
+                  onPressed: () => _recordExtra(matchProvider, 'noball'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
                   ),
-                );
-              }).toList(),
+                  child: const Text('No Ball'),
+                ),
+                ElevatedButton(
+                  onPressed: () => _recordExtra(matchProvider, 'bye'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  child: const Text('Bye'),
+                ),
+                ElevatedButton(
+                  onPressed: () => _recordExtra(matchProvider, 'legbye'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  child: const Text('Leg Bye'),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showWicketDialog(matchProvider),
-                    icon: const Icon(Icons.close),
-                    label: const Text('Wicket'),
+                  child: ElevatedButton(
+                    onPressed: () => _recordWicket(matchProvider),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
                     ),
+                    child: const Text('Wicket'),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: ElevatedButton(
                     onPressed: () => matchProvider.swapStrike(),
-                    icon: const Icon(Icons.swap_horiz),
-                    label: const Text('Swap'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
+                    child: const Text('Swap Strike'),
                   ),
                 ),
               ],
@@ -488,8 +341,84 @@ Widget _buildScoringButtons(MatchProvider matchProvider) {
         ),
       ),
     );
-  }  Wi
-dget _buildExtrasButtons(MatchProvider matchProvider) {
-    return Card(
-      elevation: 2,
-   
+  }
+
+  void _recordRuns(MatchProvider matchProvider, int runs) {
+    matchProvider.recordBall(runs: runs);
+  }
+
+  void _recordExtra(MatchProvider matchProvider, String type) {
+    switch (type) {
+      case 'wide':
+        matchProvider.recordBall(runs: 1, isWide: true);
+        break;
+      case 'noball':
+        matchProvider.recordBall(runs: 1, isNoBall: true);
+        break;
+      case 'bye':
+        matchProvider.recordBall(runs: 1, isBye: true);
+        break;
+      case 'legbye':
+        matchProvider.recordBall(runs: 1, isLegBye: true);
+        break;
+    }
+  }
+
+  void _recordWicket(MatchProvider matchProvider) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Record Wicket'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Bowled'),
+              onTap: () {
+                Navigator.pop(context);
+                matchProvider.recordBall(
+                  runs: 0,
+                  isWicket: true,
+                  wicketType: 'Bowled',
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Caught'),
+              onTap: () {
+                Navigator.pop(context);
+                matchProvider.recordBall(
+                  runs: 0,
+                  isWicket: true,
+                  wicketType: 'Caught',
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('LBW'),
+              onTap: () {
+                Navigator.pop(context);
+                matchProvider.recordBall(
+                  runs: 0,
+                  isWicket: true,
+                  wicketType: 'LBW',
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Run Out'),
+              onTap: () {
+                Navigator.pop(context);
+                matchProvider.recordBall(
+                  runs: 0,
+                  isWicket: true,
+                  wicketType: 'Run Out',
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
