@@ -6,6 +6,9 @@ import 'screens/home_screen.dart';
 import 'screens/match_setup_screen.dart';
 import 'screens/view_scoreboard.dart';
 import 'screens/scoreboard_screen.dart';
+import 'screens/player_selection_screen.dart';
+import 'screens/match_history_screen.dart';
+import 'screens/statistics_screen.dart';
 
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.dark);
 
@@ -25,7 +28,7 @@ class CricketScoreboardApp extends StatelessWidget {
         valueListenable: themeNotifier,
         builder: (context, mode, _) {
           return MaterialApp(
-            title: 'Cricket Scoreboard',
+            title: 'Cricket Scoreboard Pro',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
@@ -34,8 +37,11 @@ class CricketScoreboardApp extends StatelessWidget {
             routes: {
               '/': (context) => const HomeScreen(),
               '/match-setup': (context) => const MatchSetupScreen(),
+              '/player-selection': (context) => const PlayerSelectionScreen(),
               '/scoreboard': (context) => const ScoreboardScreen(),
               '/view-scoreboard': (context) => const ViewScoreBoard(),
+              '/match-history': (context) => const MatchHistoryScreen(),
+              '/statistics': (context) => const StatisticsScreen(),
             },
           );
         },

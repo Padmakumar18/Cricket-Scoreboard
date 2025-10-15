@@ -248,14 +248,14 @@ class _HomeScreenState extends State<HomeScreen> {
         'subtitle': 'View past matches',
         'icon': Icons.history,
         'color': AppTheme.warningColor,
-        'onTap': () => _showComingSoon(context),
+        'onTap': () => Navigator.pushNamed(context, '/match-history'),
       },
       {
         'title': 'Statistics',
         'subtitle': 'Player & team stats',
         'icon': Icons.bar_chart,
         'color': AppTheme.accentColor,
-        'onTap': () => _showComingSoon(context),
+        'onTap': () => Navigator.pushNamed(context, '/statistics'),
       },
     ];
 
@@ -390,24 +390,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 .fadeIn(duration: 400.ms)
                 .slideX(begin: 0.2);
           }),
-        ],
-      ),
-    );
-  }
-
-  void _showComingSoon(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Coming Soon'),
-        content: const Text(
-          'This feature will be available in a future update.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
         ],
       ),
     );
